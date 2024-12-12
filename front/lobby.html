@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect 4 Lobby</title>
+
+    <link rel="stylesheet" href="src/css/stylesheet.css">
+    <script type="module" src="src/lobby.js"></script>
+</head>
+
+<body onload="LOBBY.init();">
+    <h1>Connect Four</h1>
+    <div id="lobbyLayout">
+        <div id="chatSection">
+            <h1>Lobby Chat</h1>
+            <div id="chat"></div>
+            <input type="text" id="messageInput" placeholder="Type your message...">
+            <button id="sendBtn">Send</button>
+        </div>
+        
+        <div id="challengeSection">
+            <h2>Send a Challenge</h2>
+            <label for="userSelect">Choose a user:</label>
+            <select id="userSelect">
+                <option value="" disabled selected>Select a user</option>
+            </select>
+            <textarea id="challengeMessage" placeholder="Enter challenge message" rows="15" cols="50"></textarea>
+            <button id="sendChallengeBtn">Send Challenge</button>
+        </div>
+        
+        <div id="pastGames"></div>
+    </div>
+</body>
+
+</html>

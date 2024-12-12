@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect 4</title>
+
+    <link rel="stylesheet" href="src/css/stylesheet.css">
+    <script type="module" src="./src/game.js"></script>
+    </head>
+
+    <body onload="GAME.init();">
+        <h1>Connect Four</h1>
+        <div id="winner"></div>
+        <div id="gameLayout">
+            <section id="game"></section>
+            <div id="chatSection">
+                <h2>Game Chat</h2>
+                <div id="gameChat"></div><br>
+                <input type="text" id="messageInput" placeholder="Type your message...">
+                <button id="sendBtn">Send</button>
+            </div>
+        </div>
+    </body>
+</html>
