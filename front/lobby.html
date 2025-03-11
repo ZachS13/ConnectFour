@@ -10,7 +10,7 @@
     <script type="module" src="src/lobby.js"></script>
 </head>
 
-<body onload="LOBBY.init();">
+<body>
     <h1>Connect Four</h1>
     <div id="lobbyLayout">
         <div id="chatSection">
@@ -32,6 +32,11 @@
         
         <div id="pastGames"></div>
     </div>
-</body>
 
+    <script>
+        window.onload = () => {
+            LOBBY.init();
+        };
+    </script>
+</body>
 </html>
