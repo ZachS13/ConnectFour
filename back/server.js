@@ -6,11 +6,11 @@ const express    = require('express'),
       app        = express(),
       bodyParser = require('body-parser'),
       http       = require('http'),
-      server = http.createServer(app),
-      socketIo = require('socket.io'),
-      db = require(`./db.js`),
-      logic = require(`./logic.js`),
-      sh = require('./socketHandler.js');
+      server     = http.createServer(app),
+      socketIo   = require('socket.io'),
+      db         = require(`./db.js`),
+      logic      = require(`./logic.js`),
+      sh         = require('./socketHandler.js');
 
 // origin: "*" -- Allows all origins, this can be changed to restrict it. 
 const io = socketIo(server, {
@@ -166,7 +166,8 @@ io.on('connection', (socket) => {
     socket.on('register', (user) => {
         userId = user.id;  // Save user ID for future reference
         userSockets.set(userId, socket);
-        console.log(`User ${userId} registered with socket ID ${socket.id}`);
+        socket.join('lobby');  // Ensure the user joins the 'lobby' room
+        console.log(`User ${userId} registered with socket ID ${socket.id} and joined the lobby room`);
     });
 
     /**
@@ -177,20 +178,20 @@ io.on('connection', (socket) => {
      */
 
     // Handle incoming lobby messages and actions like sending and declining challenges
-    io.on('lobbyMessage', (data) => {
+    socket.on('lobbyMessage', async (data) => {
         const { room, message, action, targetUserId, challengeId } = data;
 
-        if (action === 'sendChallenge') {
-            handleSendChallenge(socket, targetUserId, challengeId, message);
+        console.log('Received message data:', data);  // Log the incoming message
+
+        if (action === 'message') {
+            console.log('Broadcasting message to room:', message); // Log the message being broadcasted
+            io.to(room).emit('lobbyMessage', { action: 'message', room, message });
+        } else if (action === 'sendChallenge') {
+            sh.handleSendChallenge(socket, targetUserId, challengeId, message);
         } else if (action === 'declineChallenge') {
-            handleDeclineChallenge(socket, targetUserId, challengeId);
+            sh.handleDeclineChallenge(socket, targetUserId, challengeId);
         } else {
-            // Standard lobby message (non-action message)
-            if (socket.rooms.has(room)) {
-                socket.to(room).emit('message', { room, message });
-            } else {
-                socket.emit('error', { error: "Room does not exist" });
-            }
+            socket.emit('error', { error: `Action does not exist: ${action}` });
         }
     });
 

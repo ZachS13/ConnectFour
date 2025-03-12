@@ -42,25 +42,31 @@ const LOBBY = (function () {
               challengeBtn = document.getElementById('sendChallengeBtn');
 
         socket.on('connect', () => {
-            console.log("Connected to Socket.io server");
+            console.log('Successfully connected to the server!'); 
+
             const joinMessage = {
                 action: "join",
                 room: "lobby",
             };
+            socket.emit('register', { id: userId });
             socket.emit('lobbyMessage', joinMessage);
         });
         
 
         // Chat messages (lobby chat)
-        socket.on('message', async (data) => {
-            
-            if (data.action === 'message'){
-                // Handle regular chat messages
-                const msg = document.createElement('div'),
-                    mess = data.message
-                msg.innerHTML = mess;
+        socket.on('lobbyMessage', async (data) => {
+            console.log("Received message data:", data);  // Log the data received from the server
+
+            if (data.action === 'message') {
+                const msg = document.createElement('div');
+                const mess = data.message;
+
+                console.log("Message content:", mess);  // Log the message content
+
+                msg.innerHTML = mess || "Empty message";  // Handle any edge cases
                 chatDiv.appendChild(msg);
-                chatDiv.scrollTop = chatDiv.scrollHeight;
+
+                chatDiv.scrollTop = chatDiv.scrollHeight;  // Scroll the chat to the bottom
             } else if (data.action === 'challenge') {
                 // Handle challenge messages
                 console.log(data);
@@ -117,16 +123,16 @@ const LOBBY = (function () {
         // User sends a normal message.
         sendBtn.addEventListener('click', () => {
             const messageInput = document.getElementById('messageInput'),
-                  textMessage = `${usernmae}: ${messageInput.value.trim()}`;
-            
+                  textMessage = `${username}: ${messageInput.value.trim()}`;
             if (textMessage !== '') {
                 const message = {
                     action: "message",
                     room: "lobby",
                     message: textMessage,
                 };
+                console.log(message);
                 socket.emit('lobbyMessage', message);   // Emit the message to the lobby.
-                messageInput = '';                      // Clear the message field.
+                messageInput.value = '';            // Clear the message field.
             }
         });
 
