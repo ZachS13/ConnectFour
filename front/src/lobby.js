@@ -1,3 +1,5 @@
+const API_URL = '://localhost:3000';
+
 /**
  * Check if the session variables are set, if they're
  * not, redirect to the login page. If they are, use the
@@ -10,7 +12,7 @@ if(!userId || !sessionId) {
     window.location = './login.html';
 }
 try {
-    const responseSession = await fetch('http://localhost:3000/checkSession', {
+    const responseSession = await fetch(`http${API_URL}/checkSession`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, sessionId })
@@ -32,7 +34,7 @@ const LOBBY = (function () {
     function init() {
         dropDownWithUsernames();
 
-        const socket = new WebSocket(`ws://localhost:3000?userId=${userId}`),
+        const socket = new WebSocket(`ws${API_URL}?userId=${userId}`),
             chatDiv = document.getElementById('chat'),
             messageInput = document.getElementById('messageInput'),
             sendBtn = document.getElementById('sendBtn'),
@@ -178,7 +180,7 @@ const LOBBY = (function () {
         const dropdown = document.getElementById('userSelect');
 
         try {
-            const response = await fetch('http://localhost:3000/usernames', {
+            const response = await fetch(`http${API_URL}/usernames`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
             });
@@ -209,7 +211,7 @@ const LOBBY = (function () {
      * @returns {String} Username corresponding to the ID.
      */
     async function getUsernameId(userId) {
-        const response = await fetch('http://localhost:3000/getUsername', {
+        const response = await fetch(`http${API_URL}/getUsername`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId })
@@ -229,7 +231,7 @@ const LOBBY = (function () {
      * @returns {Integer} - ID of the challenge in the DB.
      */
     async function sendChallengeToDB(userId, challengerId) {
-        const response = await fetch('http://localhost:3000/sendChallenge', {
+        const response = await fetch(`http${API_URL}/sendChallenge`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId, challengerId })
@@ -243,7 +245,7 @@ const LOBBY = (function () {
     }
 
     async function sendChallengeResponse(challengeId, reply) {
-        const response = await fetch('http://localhost:3000/challengeResponse', {
+        const response = await fetch(`http${API_URL}/challengeResponse`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ challengeId, reply })

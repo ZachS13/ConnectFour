@@ -5,11 +5,12 @@
 const express    = require('express'),
       app        = express(),
       bodyParser = require('body-parser'),
-      db         = require(`./db.js`),
-      logic      = require(`./logic.js`),
       http       = require('http'),
       server = http.createServer(app),
-      socketIo = require('socket.io');
+      socketIo = require('socket.io'),
+      db = require(`./db.js`),
+      logic = require(`./logic.js`),
+      sh = require('./socketHandler.js');
 
 // origin: "*" -- Allows all origins, this can be changed to restrict it. 
 const io = socketIo(server, {
