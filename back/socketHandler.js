@@ -18,6 +18,10 @@ async function handleLobbyChatMessages(io, userId, action, room, message) {
     io.to(room).emit('lobbyMessage', { action: action, room, message });
 }
 
+async function sendChallenge() {
+
+}
+
 /**
  * Handle accepting the challenge from the user.
  * @param {Socket} socket - The socket of the user is currently using (most likely lobby) 
@@ -25,20 +29,7 @@ async function handleLobbyChatMessages(io, userId, action, room, message) {
  * @param {*} challengeId - ChallengeID.
  */
 function handleAcceptChallenge(socket, targetUserId, challengeId) {
-    if (targetUserId && userSockets.has(targetUserId)) {
-        const targetSocket = userSockets.get(targetUserId);
-        const challengeMessage = {
-            action: "challenge",
-            challengeId,
-            senderId: socket.id,
-            message,
-        };
 
-        targetSocket.emit('challenge', challengeMessage);
-        console.log(`Challenge sent from User ${socket.id} to User ${targetUserId}`);
-    } else {
-        socket.emit('error', { error: "Target user is not connected" });
-    }
 }
 
 /**
@@ -48,15 +39,14 @@ function handleAcceptChallenge(socket, targetUserId, challengeId) {
  * @param {Integer} challengeId - ChallengeID.
  * @returns Reply message for declined challenge.
  */
-function handleDeclineChallenge(socket, targetUserId, challengeId) {
+async function handleDeclineChallenge(socket, targetUserId, challengeId) {
     if (!challengeId) {
         socket.emit('error', { error: "challengeId is required to decline a challenge" });
         return;
     }
 
     try {
-        // Assuming logic.getChallengeWithId is a function that retrieves the challenge details
-        const challenge = logic.getChallengeWithId(challengeId);
+        const challenge = await logic.getChallengeWithId(challengeId);
         if (challenge.length === 0) {
             socket.emit('error', { error: `Challenge with ID ${challengeId} not found` });
             console.log(`Challenge ${challengeId} not found`);
@@ -77,6 +67,8 @@ function handleDeclineChallenge(socket, targetUserId, challengeId) {
 
             senderSocket.emit('challengeDeclined', declineMessage);
             console.log(`Challenge ${challengeId} declined by User ${socket.id}`);
+            return logic.sendChallengeResponse(challengeId, 0);
+            
         } else {
             console.log(`Failed to send decline message: User ${senderId} not connected`);
         }
