@@ -2,6 +2,21 @@
  * This file handles certain socket funcions like sending an accepted or declined
  * challenge back to the user who sent it.
  */
+const logic = require(`./logic.js`);
+
+/**
+ * Handles when a user sends a message to the lobby, will emit the message and save it
+ * in the database.
+ * @param {io} io - With the given io, emit the message to the room.
+ * @param {Integer} userId - UserId that is sending the message.
+ * @param {String} action - Action of the message (should be 'message').
+ * @param {String} room - Room being sent the messgae (should be 'lobby').
+ * @param {String} message - Message being sent.
+ */
+async function handleLobbyChatMessages(io, userId, action, room, message) {
+    await logic.sendLobbyMessage(userId, message);
+    io.to(room).emit('lobbyMessage', { action: action, room, message });
+}
 
 /**
  * Handle accepting the challenge from the user.
@@ -69,4 +84,10 @@ function handleDeclineChallenge(socket, targetUserId, challengeId) {
         console.error("Error declining challenge:", err);
         socket.emit('error', { error: "Failed to decline challenge" });
     }
+}
+
+module.exports = {
+    handleLobbyChatMessages,
+    handleAcceptChallenge,
+    handleDeclineChallenge,
 }

@@ -130,6 +130,19 @@ async function getSessionTokenWithIdUserId(sessionId, userId) {
     return response.token;
 }
 
+/**
+ * Send the message sent by the user into the database.
+ * @param {Integer} senderId - UserId of who sent the message.
+ * @param {String} message - Message being sent.
+ * @returns Response from the database.
+ */
+async function sendLobbyMessage(senderId, message) {
+    const now = new Date();
+    const timeSent = formatDateForSQL(now);
+    const response = await DB.sendLobbyMessage(senderId, message, timeSent);
+    return response;
+}
+
 async function getChallengeWithId(challengeId) {
     const response = await DB.getChallengeWithId(challengeId);
     return response;
@@ -269,6 +282,7 @@ module.exports = {
     createSessionToken,
     getSessionTokenWithIdUserId,
 
+    sendLobbyMessage,
     getChallengeWithId,
     sendChallenge,
     sendChallengeResponse,

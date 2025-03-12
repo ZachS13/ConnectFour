@@ -110,6 +110,18 @@ async function addSessionToUser(userId, token, exprDate) {
 //  MESSAGES DATABASE QUERIES  //
 /////////////////////////////////
 
+/**
+ * Message sent in the lobby.
+ * @param {Integer} senderId - UserId of who sent the message.
+ * @param {String} message - Message that is being sent.
+ * @param {Date} timeSent - When was the message sent.
+ * @returns 
+ */
+async function sendLobbyMessage(senderId, message, timeSent) {
+    const [result] = await pool.execute(`INSERT INTO chatmessage (sender_id, message, time_sent) VALUES (?, ?, ?)`, [senderId, message, timeSent]);
+    return result.insertId;
+}
+
 async function getChallengeWithId(challengeId) {
     const [result] = await pool.execute(`SELECT sender_id, challenger_id FROM challenge WHERE challenge_id = ?;`, [challengeId]);
     return result[0];
@@ -154,6 +166,7 @@ module.exports = {
     getStoredSessionToken,
     addSessionToUser,
 
+    sendLobbyMessage,
     getChallengeWithId,
     sendAChallenge,
     sendChallengeResponse,

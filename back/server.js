@@ -10,7 +10,7 @@ const express    = require('express'),
       socketIo   = require('socket.io'),
       db         = require(`./db.js`),
       logic      = require(`./logic.js`),
-      sh         = require('./socketHandler.js');
+      sHandler   = require('./socketHandler.js');
 
 // origin: "*" -- Allows all origins, this can be changed to restrict it. 
 const io = socketIo(server, {
@@ -158,8 +158,6 @@ let userSockets = new Map();  // Map to store user IDs to their sockets
 
 // Handle new connections
 io.on('connection', (socket) => {
-    console.log(`User connected: ${socket.id}`);
-
     let userId;
 
     // Register user
@@ -167,7 +165,7 @@ io.on('connection', (socket) => {
         userId = user.id;  // Save user ID for future reference
         userSockets.set(userId, socket);
         socket.join('lobby');  // Ensure the user joins the 'lobby' room
-        console.log(`User ${userId} registered with socket ID ${socket.id} and joined the lobby room`);
+        console.log(`User ${userId} registered with socket ID ${socket.id}`);
     });
 
     /**
@@ -179,17 +177,14 @@ io.on('connection', (socket) => {
 
     // Handle incoming lobby messages and actions like sending and declining challenges
     socket.on('lobbyMessage', async (data) => {
-        const { room, message, action, targetUserId, challengeId } = data;
-
-        console.log('Received message data:', data);  // Log the incoming message
+        const { userId, room, message, action, targetUserId, challengeId } = data;
 
         if (action === 'message') {
-            console.log('Broadcasting message to room:', message); // Log the message being broadcasted
-            io.to(room).emit('lobbyMessage', { action: 'message', room, message });
+            await sHandler.handleLobbyChatMessages(io, userId, action, room, message);
         } else if (action === 'sendChallenge') {
-            sh.handleSendChallenge(socket, targetUserId, challengeId, message);
+            sHandler.handleAcceptChallenge(socket, targetUserId, challengeId, message);
         } else if (action === 'declineChallenge') {
-            sh.handleDeclineChallenge(socket, targetUserId, challengeId);
+            await sHandler.handleDeclineChallenge(socket, targetUserId, challengeId);
         } else {
             socket.emit('error', { error: `Action does not exist: ${action}` });
         }
