@@ -78,6 +78,7 @@ app.post(`/createAccount`, async (req, res) => {
     }
 });
 
+// Get the username with the given id.
 app.post(`/getUsername`, async (req, res) => {
     const { userId } = req.body;
     try {
@@ -92,6 +93,7 @@ app.post(`/getUsername`, async (req, res) => {
     }
 });
 
+// Get a list of all usernames.
 app.get(`/usernames`, async (req, res) => {
     try {
         const results = await db.getAllUsernames();
@@ -102,6 +104,7 @@ app.get(`/usernames`, async (req, res) => {
     }
 });
 
+// Check if the users session is valid and stored.
 app.post(`/checkSession`, async (req, res) => {
     const { userId, sessionId } = req.body;
     try {
@@ -121,6 +124,7 @@ app.post(`/checkSession`, async (req, res) => {
     }
 });
 
+// Send challenge to a specfied user.
 app.post(`/sendChallenge`, async (req,res) => {
     const { userId, challengerId } = req.body;
     try {
@@ -134,6 +138,7 @@ app.post(`/sendChallenge`, async (req,res) => {
     }
 });
 
+// Reply to a challenge.
 app.post(`/challengeResponse`, async (req, res) => {
     const { challengeId, reply } = req.body;
     try {
