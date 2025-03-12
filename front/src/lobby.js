@@ -55,13 +55,10 @@ const LOBBY = (function () {
 
         // Chat messages (lobby chat)
         socket.on('lobbyMessage', async (data) => {
-            console.log("Received message data:", data);  // Log the data received from the server
 
             if (data.action === 'message') {
                 const msg = document.createElement('div');
                 const mess = data.message;
-
-                console.log("Message content:", mess);  // Log the message content
 
                 msg.innerHTML = mess || "Empty message";  // Handle any edge cases
                 chatDiv.appendChild(msg);
@@ -126,6 +123,7 @@ const LOBBY = (function () {
                   textMessage = `${username}: ${messageInput.value.trim()}`;
             if (textMessage !== '') {
                 const message = {
+                    userId: userId,
                     action: "message",
                     room: "lobby",
                     message: textMessage,
