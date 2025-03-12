@@ -3,7 +3,12 @@
  * challenge back to the user who sent it.
  */
 
-
+/**
+ * Handle accepting the challenge from the user.
+ * @param {Socket} socket - The socket of the user is currently using (most likely lobby) 
+ * @param {*} targetUserId - The user you are accepting the challenge from.
+ * @param {*} challengeId - ChallengeID.
+ */
 function handleAcceptChallenge(socket, targetUserId, challengeId) {
     if (targetUserId && userSockets.has(targetUserId)) {
         const targetSocket = userSockets.get(targetUserId);
@@ -23,7 +28,7 @@ function handleAcceptChallenge(socket, targetUserId, challengeId) {
 
 /**
  * Handle sending back to the user a declined challenge message.
- * @param {Socket} socket -  The socket of the user is currently using (most likely lobby) 
+ * @param {Socket} socket - The socket of the user is currently using (most likely lobby) 
  * @param {Integer} targetUserId - UserID of the user who sent the challenge.
  * @param {Integer} challengeId - ChallengeID.
  * @returns Reply message for declined challenge.
