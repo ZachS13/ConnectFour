@@ -33,43 +33,45 @@ const LOBBY = (function () {
 
     function init() {
         dropDownWithUsernames();
+        const socket = io(`http${API_URL}`, {
+            query: { userId: userId }
+        });
+        const chatDiv = document.getElementById('chat'),
+              messageInput = document.getElementById('messageInput'),
+              sendBtn = document.getElementById('sendBtn'),
+              challengeBtn = document.getElementById('sendChallengeBtn');
 
-        const socket = new WebSocket(`ws${API_URL}?userId=${userId}`),
-            chatDiv = document.getElementById('chat'),
-            messageInput = document.getElementById('messageInput'),
-            sendBtn = document.getElementById('sendBtn'),
-            challengeBtn = document.getElementById('sendChallengeBtn');
-
-        socket.addEventListener('open', () => {
-            console.log("Connected to WebSocket server");
+        socket.on('connect', () => {
+            console.log("Connected to Socket.io server");
             const joinMessage = {
                 action: "join",
                 room: "lobby",
             };
-            socket.send(JSON.stringify(joinMessage));
+            socket.emit('lobbyMessage', joinMessage);
         });
+        
 
-        // When we receive a message from the server
-        socket.addEventListener('message', async (event) => {
-            const data = JSON.parse(event.data);
-
-            if (data.action === "message") {
+        // Chat messages (lobby chat)
+        socket.on('message', async (data) => {
+            
+            if (data.action === 'message'){
                 // Handle regular chat messages
                 const msg = document.createElement('div'),
-                      mess = data.message
+                    mess = data.message
                 msg.innerHTML = mess;
                 chatDiv.appendChild(msg);
                 chatDiv.scrollTop = chatDiv.scrollHeight;
-            } else if (data.action === "challenge") {
+            } else if (data.action === 'challenge') {
                 // Handle challenge messages
-                console.log(data);  
+                console.log(data);
 
+                // Create how the message will look.
                 const senderUsername = await getUsernameId(data.senderId),
                       challengeMsg = document.createElement('div');
                 challengeMsg.setAttribute('id', 'challengeMsg');
                 challengeMsg.innerHTML = `Challenge from ${senderUsername}: ${data.message}</br>`;
 
-                // Create the "Accept" button
+                // Create the accept button. 
                 const acceptButton = document.createElement('button');
                 acceptButton.textContent = 'Accept';
                 acceptButton.classList.add('accept-button');
@@ -80,24 +82,19 @@ const LOBBY = (function () {
                     console.log("You accepted the game request", reply);
                 });
 
-                // Create the "Deny" button
-                const denyButton = document.createElement('button');
-                denyButton.textContent = 'Decline';
-                denyButton.classList.add('deny-button');
-                challengeMsg.appendChild(denyButton);
-
+                // Create the decline button
                 denyButton.addEventListener('click', async () => {
                     const reply = await sendChallengeResponse(data.challengeId, "decline"),
-                          sendDecline = {
-                              action: "declineChallenge",
-                              challengeId: data.challengeId
-                          }
-                    socket.send(JSON.stringify(sendDecline));
+                           sendDecline = {
+                                action: "declineChallenge",
+                                challengeId: data.challengeId
+                            }
+                    socket.emit('lobbyMessage', sendDecline);  // Use socket.emit to send decline
                     denyButton.style.display = 'none';
-                    acceptButton.style.display= 'none';
+                    acceptButton.style.display = 'none';
 
                     const declineMessage = "You declined the challenge.",
-                          declineDiv = document.createElement('div');
+                        declineDiv = document.createElement('div');
                     declineDiv.innerHTML = declineMessage;
                     declineDiv.style.color = "orange";
                     chatDiv.appendChild(declineDiv);
@@ -106,7 +103,7 @@ const LOBBY = (function () {
 
                 chatDiv.appendChild(challengeMsg);
                 chatDiv.scrollTop = chatDiv.scrollHeight;
-            } else if (data.action === "challengeDeclined") {
+            } else if (data.action === 'challengeDeclined') {
                 // Handle challenge declined
                 const declineMsg = document.createElement('div');
                 declineMsg.style.color = 'orange';
@@ -117,19 +114,19 @@ const LOBBY = (function () {
             }
         });
 
-        // When the user clicks "Send"
+        // User sends a normal message.
         sendBtn.addEventListener('click', () => {
-            const messageInput = document.getElementById('messageInput');
-            const textMessage = `${username}: ${messageInput.value.trim()}`
-
+            const messageInput = document.getElementById('messageInput'),
+                  textMessage = `${usernmae}: ${messageInput.value.trim()}`;
+            
             if (textMessage !== '') {
                 const message = {
                     action: "message",
                     room: "lobby",
                     message: textMessage,
                 };
-                socket.send(JSON.stringify(message));
-                messageInput.value = ''; // Clear the input field
+                socket.emit('lobbyMessage', message);   // Emit the message to the lobby.
+                messageInput = '';                      // Clear the message field.
             }
         });
 
@@ -161,7 +158,7 @@ const LOBBY = (function () {
             challSent.style.color = "grey";
             chatDiv.appendChild(challSent);
 
-            socket.send(JSON.stringify(message)); 
+            socket.emit('lobbyMessage', message);
         });
 
         // Allow pressing Enter to send message
