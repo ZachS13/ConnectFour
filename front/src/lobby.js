@@ -78,6 +78,12 @@ const LOBBY = (function () {
                 acceptButton.classList.add('accept-button');
                 challengeMsg.appendChild(acceptButton);
 
+                // Create the decline button
+                const denyButton = document.createElement('button');
+                denyButton.textContent = 'Decline';
+                denyButton.classList.add('deny-button');
+                challengeMsg.appendChild(denyButton);
+
                 acceptButton.addEventListener('click', async () => {
                     const reply = await sendChallengeResponse(data.challengeId, "accept"),
                           sendAccept= {
@@ -86,15 +92,12 @@ const LOBBY = (function () {
                               senderId: data.senderId,
                               challengeId: data.challengeId
                           };
+                    denyButton.style.display = 'none';
+                    acceptButton.style.display = 'none';
                     socket.emit('lobbyMessage', sendAccept);                          
                     console.log("You accepted the game request", reply);
                 });
 
-                // Create the decline button
-                const denyButton = document.createElement('button');
-                denyButton.textContent = 'Decline';
-                denyButton.classList.add('deny-button');
-                challengeMsg.appendChild(denyButton);
                 denyButton.addEventListener('click', async () => {
                     const reply = await sendChallengeResponse(data.challengeId, "decline"),
                            sendDecline = {
@@ -119,13 +122,22 @@ const LOBBY = (function () {
                 chatDiv.scrollTop = chatDiv.scrollHeight;
             } else if (data.action === 'challengeDeclined') {
                 // Handle challenge declined
-                console.log(data);
                 const declineMsg = document.createElement('div');
                 declineMsg.style.color = 'orange';
                 const challengerUsername = await getUsernameId(data.userId);
                 declineMsg.innerHTML = `${challengerUsername} declined your challenge request.`;
                 chatDiv.appendChild(declineMsg);
                 chatDiv.scrollTop = chatDiv.scrollHeight;
+            } else if (data.action === 'challengeAccepted') {
+                const acceptMsg = document.createElement('div');
+                acceptMsg.style.color = 'green';
+                const senderUsername = await getUsernameId(data.senderId);
+                const challengerUsername = await getUsernameId(data.targetId);
+                acceptMsg.innerHTML = `${challengerUsername} and ${senderUsername} playing...`;
+                chatDiv.appendChild(acceptMsg);
+                chatDiv.scrollTop = chatDiv.scrollHeight;
+
+                window.location.href = "game.html";
             }
         });
 

@@ -185,10 +185,14 @@ io.on('connection', (socket) => {
             const targetUserSocketId = userSockets.get(targetUserId);
             sHandler.handleSendingChallenge(io, userId, targetUserSocketId, challengeId, message);
         } else if (action === 'acceptChallenge') {
-            sHandler.handleAcceptChallenge(io, targetUserId, challengeId, message);
+            console.log(data);
+            const targetId = data.userId;
+            const targetUserSocketId = userSockets.get(targetId);
+            const senderId = data.senderId;
+            const senderSocketId = userSockets.get(senderId);
+            sHandler.handleAcceptChallenge(io, senderId, senderSocketId, targetId, targetUserSocketId, challengeId, message);
         } else if (action === 'declineChallenge') {
             const targetUserSocketId = userSockets.get(data.senderId);
-            console.log(data, targetUserSocketId);
             sHandler.handleDeclineChallenge(io, targetUserSocketId, challengeId);
         } else {
             socket.emit('error', { error: `Action does not exist: ${action}` });

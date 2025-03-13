@@ -37,8 +37,15 @@ function handleSendingChallenge(io, userId, targetUserSocketId, challengeId, mes
     io.to(targetUserSocketId).emit("lobbyMessage", challengeMessage);
 }
 
-function handleAcceptChallenge(io, targetUserId, challengeId) {
-
+function handleAcceptChallenge(io, senderId, senderSocketId, targetId, targetUserSocketId, challengeId) {
+    const acceptChallengeMessage = {
+        action: "challengeAccepted",
+        challengeId: challengeId,
+        senderId: senderId,
+        targetId: targetId,
+    };
+    io.to(targetUserSocketId).emit("lobbyMessage", acceptChallengeMessage);
+    io.to(senderSocketId).emit("lobbyMessage", acceptChallengeMessage);
 }
 
 
@@ -46,7 +53,7 @@ function handleDeclineChallenge(io, targetUserSocketId, challengeId) {
     const declineChallengeMessage = {
         action: "challengeDeclined",
         challengeId: challengeId,
-    }
+    };
     io.to(targetUserSocketId).emit("lobbyMessage", declineChallengeMessage);
 }
 
