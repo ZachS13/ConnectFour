@@ -180,14 +180,16 @@ io.on('connection', (socket) => {
         const { userId, room, message, action, targetUserId, challengeId } = data;
 
         if (action === 'message') {
-            await sHandler.handleLobbyChatMessages(socket, userId, action, room, message);
+            await sHandler.handleLobbyChatMessages(io, userId, action, room, message);
         } else if (action === 'sendChallenge') {
             const targetUserSocketId = userSockets.get(targetUserId);
-            sHandler.handleSendingChallenge(io, userId, targetUserId, targetUserSocketId, challengeId, message);
+            sHandler.handleSendingChallenge(io, userId, targetUserSocketId, challengeId, message);
         } else if (action === 'acceptChallenge') {
-            sHandler.handleAcceptChallenge(socket, targetUserId, challengeId, message);
+            sHandler.handleAcceptChallenge(io, targetUserId, challengeId, message);
         } else if (action === 'declineChallenge') {
-            await sHandler.handleDeclineChallenge(socket, targetUserId, challengeId);
+            const targetUserSocketId = userSockets.get(data.senderId);
+            console.log(data, targetUserSocketId);
+            sHandler.handleDeclineChallenge(io, targetUserSocketId, challengeId);
         } else {
             socket.emit('error', { error: `Action does not exist: ${action}` });
         }

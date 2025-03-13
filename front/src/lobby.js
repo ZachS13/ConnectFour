@@ -55,7 +55,6 @@ const LOBBY = (function () {
 
         // Chat messages (lobby chat)
         socket.on('lobbyMessage', async (data) => {
-            console.log(data);
 
             if (data.action === 'message') {
                 const msg = document.createElement('div');
@@ -66,8 +65,6 @@ const LOBBY = (function () {
 
                 chatDiv.scrollTop = chatDiv.scrollHeight;  // Scroll the chat to the bottom
             } else if (data.action === 'challenge') {
-                // Handle challenge messages
-                console.log(data);
 
                 // Create how the message will look.
                 const senderUsername = await getUsernameId(data.senderId),
@@ -82,7 +79,14 @@ const LOBBY = (function () {
                 challengeMsg.appendChild(acceptButton);
 
                 acceptButton.addEventListener('click', async () => {
-                    const reply = await sendChallengeResponse(data.challengeId, "accept");
+                    const reply = await sendChallengeResponse(data.challengeId, "accept"),
+                          sendAccept= {
+                              userId: userId,
+                              action: "acceptChallenge",
+                              senderId: data.senderId,
+                              challengeId: data.challengeId
+                          };
+                    socket.emit('lobbyMessage', sendAccept);                          
                     console.log("You accepted the game request", reply);
                 });
 
@@ -98,8 +102,8 @@ const LOBBY = (function () {
                                 action: "declineChallenge",
                                 senderId: data.senderId,
                                 challengeId: data.challengeId
-                            }
-                    socket.emit('lobbyMessage', sendDecline);  // Use socket.emit to send decline
+                            };
+                    socket.emit('lobbyMessage', sendDecline);
                     denyButton.style.display = 'none';
                     acceptButton.style.display = 'none';
 
@@ -115,6 +119,7 @@ const LOBBY = (function () {
                 chatDiv.scrollTop = chatDiv.scrollHeight;
             } else if (data.action === 'challengeDeclined') {
                 // Handle challenge declined
+                console.log(data);
                 const declineMsg = document.createElement('div');
                 declineMsg.style.color = 'orange';
                 const challengerUsername = await getUsernameId(data.userId);
@@ -253,6 +258,12 @@ const LOBBY = (function () {
         return result.message;
     }
 
+    /**
+     * Send the response to the challenge to the database.
+     * @param {Integer} challengeId - Id of the challenge.
+     * @param {Object} reply - Object of the reply to the challenge.
+     * @returns Rseponse from the database.
+     */
     async function sendChallengeResponse(challengeId, reply) {
         const response = await fetch(`http${API_URL}/challengeResponse`, {
             method: 'POST',
@@ -262,11 +273,6 @@ const LOBBY = (function () {
 
         if(!response || !response) {
             console.log('There was an error replying to challenge.');
-        }
-
-        if(reply === 'accept') {
-            console.log('Handle sending them to the game.');
-            // window.location = "./game.html";
         }
 
         return response;

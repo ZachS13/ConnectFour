@@ -27,16 +27,13 @@ async function handleLobbyChatMessages(io, userId, action, room, message) {
  * @param {*} challengeId - ChallengeId.
  * @param {*} message - Message attached to the challenge.
  */
-function handleSendingChallenge(io, userId, targetUserId, targetUserSocketId, challengeId, message) {
-    console.log(`targetUserId: ${targetUserId}`);
-    console.log(`targetSocket: ${targetUserSocketId}`);
+function handleSendingChallenge(io, userId, targetUserSocketId, challengeId, message) {
     const challengeMessage = {
         action: "challenge",
         challengeId: challengeId,
         senderId: userId,
         message: message,
     };
-    console.log(challengeMessage);
     io.to(targetUserSocketId).emit("lobbyMessage", challengeMessage);
 }
 
@@ -45,8 +42,12 @@ function handleAcceptChallenge(io, targetUserId, challengeId) {
 }
 
 
-async function handleDeclineChallenge(io, targetUserId, challengeId) {
-
+function handleDeclineChallenge(io, targetUserSocketId, challengeId) {
+    const declineChallengeMessage = {
+        action: "challengeDeclined",
+        challengeId: challengeId,
+    }
+    io.to(targetUserSocketId).emit("lobbyMessage", declineChallengeMessage);
 }
 
 module.exports = {
