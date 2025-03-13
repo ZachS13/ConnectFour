@@ -163,7 +163,7 @@ io.on('connection', (socket) => {
     // Register user
     socket.on('register', (user) => {
         userId = user.id;  // Save user ID for future reference
-        userSockets.set(userId, socket);
+        userSockets.set(userId, socket.id);
         socket.join('lobby');  // Ensure the user joins the 'lobby' room
         console.log(`User ${userId} registered with socket ID ${socket.id}`);
     });
@@ -180,8 +180,11 @@ io.on('connection', (socket) => {
         const { userId, room, message, action, targetUserId, challengeId } = data;
 
         if (action === 'message') {
-            await sHandler.handleLobbyChatMessages(io, userId, action, room, message);
+            await sHandler.handleLobbyChatMessages(socket, userId, action, room, message);
         } else if (action === 'sendChallenge') {
+            const targetUserSocketId = userSockets.get(targetUserId);
+            sHandler.handleSendingChallenge(io, userId, targetUserId, targetUserSocketId, challengeId, message);
+        } else if (action === 'acceptChallenge') {
             sHandler.handleAcceptChallenge(socket, targetUserId, challengeId, message);
         } else if (action === 'declineChallenge') {
             await sHandler.handleDeclineChallenge(socket, targetUserId, challengeId);

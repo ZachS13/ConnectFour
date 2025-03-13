@@ -55,6 +55,7 @@ const LOBBY = (function () {
 
         // Chat messages (lobby chat)
         socket.on('lobbyMessage', async (data) => {
+            console.log(data);
 
             if (data.action === 'message') {
                 const msg = document.createElement('div');
@@ -86,10 +87,16 @@ const LOBBY = (function () {
                 });
 
                 // Create the decline button
+                const denyButton = document.createElement('button');
+                denyButton.textContent = 'Decline';
+                denyButton.classList.add('deny-button');
+                challengeMsg.appendChild(denyButton);
                 denyButton.addEventListener('click', async () => {
                     const reply = await sendChallengeResponse(data.challengeId, "decline"),
                            sendDecline = {
+                                userId: userId,
                                 action: "declineChallenge",
+                                senderId: data.senderId,
                                 challengeId: data.challengeId
                             }
                     socket.emit('lobbyMessage', sendDecline);  // Use socket.emit to send decline
@@ -97,7 +104,7 @@ const LOBBY = (function () {
                     acceptButton.style.display = 'none';
 
                     const declineMessage = "You declined the challenge.",
-                        declineDiv = document.createElement('div');
+                          declineDiv = document.createElement('div');
                     declineDiv.innerHTML = declineMessage;
                     declineDiv.style.color = "orange";
                     chatDiv.appendChild(declineDiv);
@@ -149,6 +156,7 @@ const LOBBY = (function () {
             const challengeId = await sendChallengeToDB(userId, targetUserId);
             console.log(challengeId);
             const message = {
+                userId: userId,
                 action: "sendChallenge",
                 targetUserId,
                 message: challengeMessage,
