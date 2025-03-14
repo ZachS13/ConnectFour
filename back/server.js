@@ -236,7 +236,7 @@ io.on('connection', (socket) => {
         } else {
             socket.emit('error', { error: "User is not in the specified game room" });
         }
-    })
+    });
 
     // Handle game chat messages
     socket.on('gameChat', (data) => {

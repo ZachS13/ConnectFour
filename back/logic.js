@@ -178,6 +178,25 @@ async function sendChallengeResponse(challengeId, reply) {
     return response;
 }
 
+async function createConnectFourGame(player1, player2) {
+    const COLS = 7;
+    const ROWS = 6;
+
+    const now = new Date();
+    const createdAt = formatDateForSQL(now);
+    const currentTurn = player1;
+    let board = [];
+    for (let i = 0; i < ROWS; i++) {
+        board[i] = [];
+        for (let j = 0; j < COLS; j++) {
+            board[i][j] = null;
+        }
+    }
+    const gameState = JSON.stringify(board);
+    const response = await DB.createConnectFourGame(player1, player2, currentTurn, createdAt, gameState);
+    return response;
+}
+
 /**
  * VALIDATION AND SANITIZATION OF ALL THE PARAMETERS BEING SENT TO THE DATABASE
  * MAKES SURE ALL OF THE VALUES ARE IN THE CORRECT FORM AND CANNOT DAMAGE
@@ -286,4 +305,6 @@ module.exports = {
     getChallengeWithId,
     sendChallenge,
     sendChallengeResponse,
+
+    createConnectFourGame,
 };

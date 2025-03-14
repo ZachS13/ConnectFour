@@ -51,7 +51,6 @@ const LOBBY = (function () {
             socket.emit('register', { id: userId });
             socket.emit('lobbyMessage', joinMessage);
         });
-        
 
         // Chat messages (lobby chat)
         socket.on('lobbyMessage', async (data) => {
@@ -62,15 +61,12 @@ const LOBBY = (function () {
 
                 msg.innerHTML = mess || "Empty message";  // Handle any edge cases
                 chatDiv.appendChild(msg);
-
-                chatDiv.scrollTop = chatDiv.scrollHeight;  // Scroll the chat to the bottom
-            } else if (data.action === 'challenge') {
-
+            } else if (data.action === 'challenge') { 
                 // Create how the message will look.
-                const senderUsername = await getUsernameId(data.senderId),
-                      challengeMsg = document.createElement('div');
+                // const senderUsername = await getUsernameId(data.senderId),
+                const challengeMsg = document.createElement('div');
                 challengeMsg.setAttribute('id', 'challengeMsg');
-                challengeMsg.innerHTML = `Challenge from ${senderUsername}: ${data.message}</br>`;
+                challengeMsg.innerHTML = `Challenge from ${username}: ${data.message}</br>`;
 
                 // Create the accept button. 
                 const acceptButton = document.createElement('button');
@@ -137,7 +133,7 @@ const LOBBY = (function () {
                 chatDiv.appendChild(acceptMsg);
                 chatDiv.scrollTop = chatDiv.scrollHeight;
 
-                window.location.href = "game.html";
+                window.location.href = `game.html?gameId=${data.gameId}`;
             }
         });
 

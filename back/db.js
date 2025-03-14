@@ -154,6 +154,10 @@ async function sendChallengeResponse(challengeId, reply) {
 //  GAME DATABASE QUERIES  //
 /////////////////////////////
 
+async function createConnectFourGame(player1, player2, currentTurn, createdAt, gameState) {
+    const [result] = await pool.execute(`INSERT INTO game (player1_id, player2_id, current_turn, created_at, game_state) VALUES (?, ?, ?, ?, ?)`, [player1, player2, currentTurn, createdAt, gameState]);
+    return result.insertId;
+}
 
 // Export the functions to use in other files
 module.exports = {
@@ -170,4 +174,6 @@ module.exports = {
     getChallengeWithId,
     sendAChallenge,
     sendChallengeResponse,
+
+    createConnectFourGame,
 };

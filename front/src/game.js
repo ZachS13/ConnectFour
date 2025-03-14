@@ -1,3 +1,5 @@
+const API_URL = '://localhost:3000';
+
 /**
  * Check if the session variables are set, if they're
  * not, redirect to the login page. If they are, use the
@@ -10,7 +12,7 @@ if (!userId || !sessionId) {
     window.location = './login.html';
 }
 try {
-    const responseSession = await fetch('http://localhost:3000/checkSession', {
+    const responseSession = await fetch(`http${API_URL}/checkSession`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, sessionId })
@@ -274,17 +276,23 @@ const GAME = (function () {
 // CHAT will hold all of the logic for the game chat
 const CHAT = (function () {
     function init() {
-        const socket = new WebSocket('ws://localhost:3000'),
-            chatDiv = document.getElementById('gameChat'),
-            messageInput = document.getElementById('messageInput'),
-            sendBtn = document.getElementById('sendBtn');
+        const socket = io(`http${API_URL}`, {
+            query: { userId: userId }
+        });
+
+        const chatDiv = document.getElementById('gameChat'),
+              messageInput = document.getElementById('messageInput'),
+              sendBtn = document.getElementById('sendBtn');
 
         // When we receive a message from the server
         socket.addEventListener('message', (event) => {
             const msg = document.createElement('div');
-            msg.textContent = event.data;
+            const mess = data.message;
+
+            msg.innerHTML = mess || "Empty message";  // Handle any edge cases
             chatDiv.appendChild(msg);
-            chatDiv.scrollTop = chatDiv.scrollHeight; // Auto-scroll to bottom
+
+            chatDiv.scrollTop = chatDiv.scrollHeight;  // Scroll the chat to the botto
         });
 
         // When the user clicks "Send"

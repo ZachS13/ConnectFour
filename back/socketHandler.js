@@ -37,12 +37,14 @@ function handleSendingChallenge(io, userId, targetUserSocketId, challengeId, mes
     io.to(targetUserSocketId).emit("lobbyMessage", challengeMessage);
 }
 
-function handleAcceptChallenge(io, senderId, senderSocketId, targetId, targetUserSocketId, challengeId) {
+async function handleAcceptChallenge(io, senderId, senderSocketId, targetId, targetUserSocketId, challengeId) {
+    const gameId = await logic.createConnectFourGame(senderId, targetId);
     const acceptChallengeMessage = {
         action: "challengeAccepted",
         challengeId: challengeId,
         senderId: senderId,
         targetId: targetId,
+        gameId: gameId,
     };
     io.to(targetUserSocketId).emit("lobbyMessage", acceptChallengeMessage);
     io.to(senderSocketId).emit("lobbyMessage", acceptChallengeMessage);
