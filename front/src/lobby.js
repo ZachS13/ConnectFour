@@ -63,10 +63,10 @@ const LOBBY = (function () {
                 chatDiv.appendChild(msg);
             } else if (data.action === 'challenge') { 
                 // Create how the message will look.
-                // const senderUsername = await getUsernameId(data.senderId),
+                const senderUsername = await getUsernameId(data.senderId);
                 const challengeMsg = document.createElement('div');
                 challengeMsg.setAttribute('id', 'challengeMsg');
-                challengeMsg.innerHTML = `Challenge from ${username}: ${data.message}</br>`;
+                challengeMsg.innerHTML = `Challenge from ${senderUsername}: ${data.message}</br>`;
 
                 // Create the accept button. 
                 const acceptButton = document.createElement('button');
@@ -124,7 +124,9 @@ const LOBBY = (function () {
                 declineMsg.innerHTML = `${challengerUsername} declined your challenge request.`;
                 chatDiv.appendChild(declineMsg);
                 chatDiv.scrollTop = chatDiv.scrollHeight;
+
             } else if (data.action === 'challengeAccepted') {
+                // Handle challenge declined
                 const acceptMsg = document.createElement('div');
                 acceptMsg.style.color = 'green';
                 const senderUsername = await getUsernameId(data.senderId);

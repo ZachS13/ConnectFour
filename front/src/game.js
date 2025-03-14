@@ -1,5 +1,5 @@
 const API_URL = '://localhost:3000';
-
+const urlParams = new URLSearchParams(window.location.search);
 /**
  * Check if the session variables are set, if they're
  * not, redirect to the login page. If they are, use the
@@ -27,6 +27,14 @@ try {
     console.log("Failed to validate session:", error);
     window.location = './login.html';
 }
+
+const socket = io(`http${API_URL}`, {
+    query: { userId: userId }
+});
+
+const gameId = urlParams.get("gameId");
+
+socket.emit("joinGame", gameId)
 
 const svgns = `http://www.w3.org/2000/svg`;
 
@@ -276,30 +284,29 @@ const GAME = (function () {
 // CHAT will hold all of the logic for the game chat
 const CHAT = (function () {
     function init() {
-        const socket = io(`http${API_URL}`, {
-            query: { userId: userId }
-        });
-
         const chatDiv = document.getElementById('gameChat'),
               messageInput = document.getElementById('messageInput'),
               sendBtn = document.getElementById('sendBtn');
 
-        // When we receive a message from the server
-        socket.addEventListener('message', (event) => {
+        socket.on("gameChat", (data) => {
             const msg = document.createElement('div');
             const mess = data.message;
 
             msg.innerHTML = mess || "Empty message";  // Handle any edge cases
             chatDiv.appendChild(msg);
 
-            chatDiv.scrollTop = chatDiv.scrollHeight;  // Scroll the chat to the botto
+            chatDiv.scrollTop = chatDiv.scrollHeight;  // Scroll the chat to the bottom
         });
-
+       
         // When the user clicks "Send"
         sendBtn.addEventListener('click', () => {
-            const text = messageInput.value;
-            if (text.trim() !== '') {
-                socket.send(text);
+            if (messageInput.value.trim() !== '') {
+                const text = `${username}: ${messageInput.value}`;
+                const message = {
+                    gameId: gameId,
+                    message: text,
+                };
+                socket.emit("gameChat", message);
                 messageInput.value = '';
             }
         });
@@ -318,3 +325,4 @@ const CHAT = (function () {
 })();
 
 window.GAME = GAME;
+window.CHAT = CHAT;

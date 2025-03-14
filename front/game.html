@@ -7,10 +7,11 @@
     <title>Connect 4</title>
 
     <link rel="stylesheet" href="src/css/stylesheet.css">
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
     <script type="module" src="./src/game.js"></script>
     </head>
 
-    <body onload="GAME.init();">
+    <body>
         <h1>Connect Four</h1>
         <div id="winner"></div>
         <div id="gameLayout">
@@ -22,5 +23,14 @@
                 <button id="sendBtn">Send</button>
             </div>
         </div>
+        <script type="module">
+            import GAME from "./game.js";
+            import CHAT from "./game.js";
+
+            document.addEventListener("DOMContentLoaded", () => {
+                GAME.init();
+                CHAT.init();
+            });
+        </script>
     </body>
 </html>
