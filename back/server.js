@@ -217,13 +217,21 @@ io.on('connection', (socket) => {
         // Add the user to the game room
         socket.join(gameId);
         console.log(`User ${socket.id} joined game room: ${gameId}`);
-
-        // Optionally, you can emit an event to the game room or to the client
-        socket.emit('gameJoined', { gameId, message: "You have joined the game room" });
-
-        // Broadcast to other users in the game room that the user has joined
-        socket.to(gameId).emit('gameMessage', { gameId, message: `User ${socket.id} has joined the game` });
     });
+
+    // Handle game chat messages
+    socket.on('gameChat', (data) => {
+        if (socket.rooms.has(data.gameId)) {
+            const message = {
+                gameId: data.gameId,
+                message: data.message,
+            };
+            io.to(data.gameId).emit('gameChat', message);
+        } else {
+            socket.emit('error', { error: "Game room does not exist" });
+        }
+    });
+
 
     // Handle leaving the game room (if the game ends or the user disconnects)
     socket.on('leaveGame', (gameId) => {
@@ -235,19 +243,6 @@ io.on('connection', (socket) => {
             socket.to(gameId).emit('gameMessage', { gameId, message: `User ${socket.id} has left the game` });
         } else {
             socket.emit('error', { error: "User is not in the specified game room" });
-        }
-    });
-
-    // Handle game chat messages
-    socket.on('gameChat', (data) => {
-        const { gameId, message } = data;
-
-        // Assuming gameId is unique for each game and used to identify game rooms
-        if (socket.rooms.has(gameId)) {
-            // Broadcast the message to everyone in the game room
-            socket.to(gameId).emit('gameMessage', { gameId, message });
-        } else {
-            socket.emit('error', { error: "Game room does not exist" });
         }
     });
 
