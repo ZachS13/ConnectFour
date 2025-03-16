@@ -178,6 +178,13 @@ async function sendChallengeResponse(challengeId, reply) {
     return response;
 }
 
+/**
+ * With the given players, create the other default information and send it to the database,
+ * returning the insert id of the game.
+ * @param {Integer} player1 - UserId of one of the players (Who sent the game challenge).
+ * @param {Integer} player2 - UserId of the other (Who accepted the challenge).
+ * @returns The gameId of the game created in the database.
+ */
 async function createConnectFourGame(player1, player2) {
     const COLS = 7;
     const ROWS = 6;
@@ -192,8 +199,17 @@ async function createConnectFourGame(player1, player2) {
             board[i][j] = null;
         }
     }
-    const gameState = JSON.stringify(board);
+    const gameState = board;
     const response = await DB.createConnectFourGame(player1, player2, currentTurn, createdAt, gameState);
+    return response;
+}
+
+/**
+ * Gets the gameBoard of the gameId given.
+ * @param {Integer} gameId - gameId of the game board you want to get.
+ */
+async function getGameInformation(gameId) {
+    const response = await DB.getGameInformation(gameId);
     return response;
 }
 
@@ -218,7 +234,7 @@ function hashTokenPart(value) {
  */
 // checks and removes if the username has unallowed characters
 function validateSanitizeUsername(username) {
-    username = username.replace(/[^a-zA-Z0-9_-]/g, '');
+    // username = username.replace(/[^a-zA-Z0-9_-]/g, '');
 
     const usernameRegex = /^[a-zA-Z0-9_-]{3,15}$/;
     let valid = usernameRegex.test(username);
@@ -307,4 +323,6 @@ module.exports = {
     sendChallengeResponse,
 
     createConnectFourGame,
+    getGameInformation,
+
 };

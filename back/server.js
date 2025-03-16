@@ -152,6 +152,24 @@ app.post(`/challengeResponse`, async (req, res) => {
     }
 });
 
+// Get the game board for a specific game.
+app.post('/getGameInformation', async (req, res) => {
+    const { gameId } = req.body;
+    console.log(`Game Id: ${gameId}`);
+    try {
+        const response = await logic.getGameInformation(gameId);
+        if (!response || response === undefined) {
+            return res.status(404).json({ error: "Game was not found!" });
+        }
+        console.log(`player1: ${response.player1_id}`);
+        console.log(`player2: ${response.player2_id}`);
+        console.log(`currentTurn: ${response.current_turn}`);
+        return res.status(200).json({ message: response });
+    } catch (error) {
+        return res.status(500).json({ error: "An error occured getting the game board!" });
+    }
+});
+
 
 // Using socket.io this is where handling lobby chat, game chat, game moves, and challenges will be handled.
 let userSockets = new Map();  // Map to store user IDs to their sockets
@@ -193,7 +211,8 @@ io.on('connection', (socket) => {
             sHandler.handleAcceptChallenge(io, senderId, senderSocketId, targetId, targetUserSocketId, challengeId, message);
         } else if (action === 'declineChallenge') {
             const targetUserSocketId = userSockets.get(data.senderId);
-            sHandler.handleDeclineChallenge(io, targetUserSocketId, challengeId);
+            const declineUserId = data.userId;
+            sHandler.handleDeclineChallenge(io, declineUserId, targetUserSocketId, challengeId);
         } else {
             socket.emit('error', { error: `Action does not exist: ${action}` });
         }

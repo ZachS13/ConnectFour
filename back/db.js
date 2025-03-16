@@ -118,12 +118,17 @@ async function addSessionToUser(userId, token, exprDate) {
  * @returns 
  */
 async function sendLobbyMessage(senderId, message, timeSent) {
-    const [result] = await pool.execute(`INSERT INTO chatmessage (sender_id, message, time_sent) VALUES (?, ?, ?)`, [senderId, message, timeSent]);
+    const [result] = await pool.execute(`INSERT INTO chatmessage (sender_id, message, time_sent) VALUES (?, ?, ?);`, [senderId, message, timeSent]);
     return result.insertId;
 }
 
+/**
+ * Gets the sender of the challenge.
+ * @param {Integer} challengeId - ChallengeId
+ * @returns Sender_id along with the challenge_id
+ */
 async function getChallengeWithId(challengeId) {
-    const [result] = await pool.execute(`SELECT sender_id, challenger_id FROM challenge WHERE challenge_id = ?;`, [challengeId]);
+    const [result] = await pool.execute(`SELECT sender_id, challenger_id FROM challenge WHERE challenge_id = ? LIMIT 1;`, [challengeId]);
     return result[0];
 }
 
@@ -154,9 +159,24 @@ async function sendChallengeResponse(challengeId, reply) {
 //  GAME DATABASE QUERIES  //
 /////////////////////////////
 
+/**
+ * 
+ * @param {Integer} player1 - UserId of the player that sent the challenge.
+ * @param {Integer} player2 - UserId of the player that accepted the challenge.
+ * @param {Integer} currentTurn - Defaultly player1_id.
+ * @param {Date} createdAt - Usually the current data and time.
+ * @param {Array} gameState - 6x7 empty 2d array.
+ * @returns 
+ */
 async function createConnectFourGame(player1, player2, currentTurn, createdAt, gameState) {
     const [result] = await pool.execute(`INSERT INTO game (player1_id, player2_id, current_turn, created_at, game_state) VALUES (?, ?, ?, ?, ?)`, [player1, player2, currentTurn, createdAt, gameState]);
     return result.insertId;
+}
+
+async function getGameInformation(gameId) {
+    const [result] = await pool.execute(`SELECT game_state, player1_id, player2_id, current_turn FROM game WHERE game_id = ? LIMIT 1;`, [gameId]);
+    if (result.length === 0) return null;
+    return result[0];
 }
 
 // Export the functions to use in other files
@@ -176,4 +196,7 @@ module.exports = {
     sendChallengeResponse,
 
     createConnectFourGame,
+    getGameInformation,
+
+
 };

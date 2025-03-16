@@ -51,9 +51,10 @@ async function handleAcceptChallenge(io, senderId, senderSocketId, targetId, tar
 }
 
 
-function handleDeclineChallenge(io, targetUserSocketId, challengeId) {
+function handleDeclineChallenge(io, declineUserId, targetUserSocketId, challengeId) {
     const declineChallengeMessage = {
         action: "challengeDeclined",
+        declineUserId: declineUserId,
         challengeId: challengeId,
     };
     io.to(targetUserSocketId).emit("lobbyMessage", declineChallengeMessage);
