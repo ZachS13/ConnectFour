@@ -57,31 +57,22 @@ const GAME = (function () {
           boardHeight = ROWS * colWidth,    // height of the board
           offset = colWidth / 2;            // offset is half of the colWidth
 
-    let currentPlayer = 'red',  // Red starts first, but will be changed to getting the person through the API
-        board = [];             // Board is the gameState of the game being played
-
+    let board = [],             // Board is the gameState of the game being played
+        player1,                // Player 1 for the game.
+        player2,                // Player 2 for the game.
+        currentTurn;            // Who's turn it is (user_id)
+    
     // Creates the empty board (2d array full of null values)
-    function init() {
-        // creates the empty board
-        for (let i = 0; i < ROWS; i++) {
-            board[i] = [];
-            for (let j = 0; j < COLS; j++) {
-                board[i][j] = null;
-            }
-        }
-        console.log(board);
+    async function init() {
+        // Get the board from the database, should just be an empty 6x7 2d array.
+        let response = await getGameInformation(gameId);
+        console.log(response);
+        board = response.game_state;
+        player1 = response.player1_id;
+        player2 = response.player2_id;
+        currentTurn = response.current_turn;
 
-        // THIS FOR TESTING GIVEN A GAME STATE
-        // let board = [
-        //     [null, null, null, null, null, null, null],
-        //     [null, null, null, null, null, null, null],
-        //     [null, null, null, null, null, null, null],
-        //     [null, null, null, null, 'red', 'yellow', null],
-        //     [null, null, null, null, 'yellow', 'red', 'yellow'],
-        //     [null, null, null, null, 'red', 'yellow', 'red']
-        // ];
-        // console.log(board);
-
+        console.log(board. player1, player2, currentTurn);
         drawBoard();
     }
 
@@ -93,10 +84,10 @@ const GAME = (function () {
         svg.setAttribute("height", boardHeight);
 
         // Create the groups
-        const board = document.createElementNS(svgns, `g`);
-        board.setAttribute(`id`, `board`);
+        const gameBaord = document.createElementNS(svgns, `g`);
+        gameBaord.setAttribute(`id`, `board`);
 
-        svg.appendChild(board);
+        svg.appendChild(gameBaord);
         $(`game`).appendChild(svg);
 
         // Background for the board
@@ -113,11 +104,14 @@ const GAME = (function () {
             for (let row = 0; row < ROWS; row++) {
                 const x = col * colWidth + (offset);  // Adjust X to center circle in the column
                 const y = row * colWidth + offset;
+                let cellValue = board[row][col];      // Grabs the value from the board from database (probably null)
+
                 new Circle({
                     cx: x,
                     cy: y,
                     col: col,
-                    row: row
+                    row: row,
+                    playerId: cellValue,
                 });
             }
 
@@ -127,10 +121,11 @@ const GAME = (function () {
     }
 
     function Circle(parameters) {
-        this.cx = parameters.cx,
-            this.cy = parameters.cy,
-            this.col = parameters.col,
-            this.row = parameters.row;
+        this.cx = parameters.cx;
+        this.cy = parameters.cy;
+        this.col = parameters.col;
+        this.row = parameters.row;
+        this.playerId = parameters.playerId;
 
         const cir = document.createElementNS(svgns, `circle`);
         cir.setAttribute(`id`, `cell_${this.col}_${this.row}`);
@@ -139,6 +134,12 @@ const GAME = (function () {
         cir.setAttribute(`cx`, this.cx);
         cir.setAttribute(`cy`, this.cy);
         $(`board`).appendChild(cir);
+
+        if (this.playerId && this.playerId === player1) {
+            ClearCol.placePiece(this.row, this.col);
+        } else if (this.playerId && this.playerId === player2) {
+            ClearCol.placePiece(this.row, this.col);
+        }
     }
 
     // Seperating the clear column from the drawBoard function.
@@ -201,13 +202,13 @@ const GAME = (function () {
         for (let row = ROWS - 1; row >= 0; row--) {
             this.row = row;
             if (!board[row][this.col]) {
-                board[this.row][this.col] = currentPlayer; // update the memory
+                board[this.row][this.col] = currentTurn; // update the memory
                 this.drawPiece(this.row, this.col);        // update the DOM
                 if (checkWin(this.row, this.col)) {
-                    alert(`${currentPlayer.toUpperCase()} wins!`);
-                    winnerModal(currentPlayer);
+                    winnerModal(currentTurn);
+                    alert(`${currentTurn.toUpperCase()} wins!`);
                 }
-                currentPlayer = currentPlayer === 'red' ? 'yellow' : 'red';  // Switch player
+                currentTurn === player1 ? player2 : player1;  // Switch player
                 break;
             }
         }
@@ -276,9 +277,30 @@ const GAME = (function () {
         $(`winner`).appendChild(modal);
     }
 
+    /**
+     * Sends a request to the API to get the game information of the specific game_id.
+     * @param {Integer} gameId - Game_id of the current game being played.
+     * @returns Response from the server with the game information on the specific game_id.
+     */
+    async function getGameInformation(gameId) {
+        let response = await fetch(`http${API_URL}/getGameInformation`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ gameId })
+        });
+
+        if (!response || response === undefined) {
+            console.log('There was an error getting the game information.');
+        }
+        console.log(`Server Response:`);
+        response = await response.json();
+        console.log(response);
+        return response.message;
+    }
+
     return {
         init: init,
-    };
+    }
 })();
 
 // CHAT will hold all of the logic for the game chat

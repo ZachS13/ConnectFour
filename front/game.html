@@ -11,7 +11,7 @@
     <script type="module" src="./src/game.js"></script>
     </head>
 
-    <body>
+    <body onload="GAME.init(); CHAT.init();">
         <h1>Connect Four</h1>
         <div id="winner"></div>
         <div id="gameLayout">
@@ -23,14 +23,5 @@
                 <button id="sendBtn">Send</button>
             </div>
         </div>
-        <script type="module">
-            import GAME from "./game.js";
-            import CHAT from "./game.js";
-
-            document.addEventListener("DOMContentLoaded", () => {
-                GAME.init();
-                CHAT.init();
-            });
-        </script>
     </body>
 </html>

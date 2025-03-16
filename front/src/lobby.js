@@ -120,7 +120,7 @@ const LOBBY = (function () {
                 // Handle challenge declined
                 const declineMsg = document.createElement('div');
                 declineMsg.style.color = 'orange';
-                const challengerUsername = await getUsernameId(data.userId);
+                const challengerUsername = await getUsernameId(data.declineUserId);
                 declineMsg.innerHTML = `${challengerUsername} declined your challenge request.`;
                 chatDiv.appendChild(declineMsg);
                 chatDiv.scrollTop = chatDiv.scrollHeight;
