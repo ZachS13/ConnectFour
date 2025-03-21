@@ -292,9 +292,7 @@ const GAME = (function () {
         if (!response || response === undefined) {
             console.log('There was an error getting the game information.');
         }
-        console.log(`Server Response:`);
         response = await response.json();
-        console.log(response);
         return response.message;
     }
 

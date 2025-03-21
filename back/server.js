@@ -161,9 +161,6 @@ app.post('/getGameInformation', async (req, res) => {
         if (!response || response === undefined) {
             return res.status(404).json({ error: "Game was not found!" });
         }
-        console.log(`player1: ${response.player1_id}`);
-        console.log(`player2: ${response.player2_id}`);
-        console.log(`currentTurn: ${response.current_turn}`);
         return res.status(200).json({ message: response });
     } catch (error) {
         return res.status(500).json({ error: "An error occured getting the game board!" });
@@ -251,6 +248,19 @@ io.on('connection', (socket) => {
         }
     });
 
+
+    socket.on('makeMove', (data) => {
+        if (socket.rooms.has(data.gameId)) {
+            const message = {
+                gameId: data.gameId,
+                row: data.row,
+                col: data.col,
+            };
+            io.to(data.gameId).emit('makeMove', message);
+        } else {
+            socket.emit('error', { error: "Game room does not exist" });
+        }
+    });
 
     // Handle leaving the game room (if the game ends or the user disconnects)
     socket.on('leaveGame', (gameId) => {
