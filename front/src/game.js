@@ -135,10 +135,8 @@ const GAME = (function () {
         cir.setAttribute(`cy`, this.cy);
         $(`board`).appendChild(cir);
 
-        if (this.playerId && this.playerId === player1) {
-            ClearCol.placePiece(this.row, this.col);
-        } else if (this.playerId && this.playerId === player2) {
-            ClearCol.placePiece(this.row, this.col);
+        if (this.playerId) {
+            drawPiece(this.row, this.col, this.playerId);
         }
     }
 
@@ -202,8 +200,8 @@ const GAME = (function () {
         for (let row = ROWS - 1; row >= 0; row--) {
             this.row = row;
             if (!board[row][this.col]) {
-                board[this.row][this.col] = currentTurn; // update the memory
-                this.drawPiece(this.row, this.col);        // update the DOM
+                board[this.row][this.col] = currentTurn;           // update the memory
+                drawPiece(this.row, this.col, currentTurn);        // update the DOM
                 if (checkWin(this.row, this.col)) {
                     winnerModal(currentTurn);
                     alert(`${currentTurn.toUpperCase()} wins!`);
@@ -215,15 +213,14 @@ const GAME = (function () {
     }
 
     // Draws the piece on top of the circle in the row and column
-    ClearCol.prototype.drawPiece = function () {
-        const x = this.col * colWidth + offset;
-        const y = this.row * colWidth + offset;
-
-        const color = currentPlayer;
+    function drawPiece(col, row, curPlayerId) {
+        const x = col * colWidth + offset,
+              y = row * colWidth + offset,
+              color = curPlayerId === player1 ? "red" : "yellow";
 
         // adding the piece to the 'played_{col}' so the transparent box is on top of the piece.
         const piece = `<circle cx="${x}" cy="${y}" r="${pieceRadius}" class="${color}" />`;
-        $(`played_${this.col}`).innerHTML += piece;
+        $(`played_${col}`).innerHTML += piece;
     }
 
     /**
