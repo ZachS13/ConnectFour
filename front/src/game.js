@@ -60,8 +60,11 @@ const GAME = (function () {
     let board = [],             // Board is the gameState of the game being played
         player1,                // Player 1 for the game.
         player2,                // Player 2 for the game.
-        currentTurn;            // Who's turn it is (user_id)
-    
+        currentTurn,            // Who's turn it is (user_id).
+        myColor,                // Player 1 = RED, Player 2 = YELLOW.
+        otherColor;             // Opposite of the my color.
+
+
     // Creates the empty board (2d array full of null values)
     async function init() {
         // Get the board from the database, should just be an empty 6x7 2d array.
@@ -72,7 +75,17 @@ const GAME = (function () {
         player2 = response.player2_id;
         currentTurn = response.current_turn;
 
-        console.log(board. player1, player2, currentTurn);
+        console.log(userId == player2);
+
+        if (userId && userId == player1) {
+            myColor = "red";
+            otherColor = 'yellow';
+        } else if (userId && userId == player2) {
+            myColor = "yellow";
+            otherColor = "red";
+        }
+
+        console.log(board, player1, player2, currentTurn);
         drawBoard();
     }
 
@@ -190,7 +203,6 @@ const GAME = (function () {
         // add the animations and add to the DOM
         column.appendChild(mouseOver);
         column.appendChild(mouseOut);
-        console.log(this);
         $(`board`).appendChild(column);
     }
 
@@ -200,11 +212,11 @@ const GAME = (function () {
         for (let row = ROWS - 1; row >= 0; row--) {
             this.row = row;
             if (!board[row][this.col]) {
-                board[this.row][this.col] = currentTurn;           // update the memory
-                drawPiece(this.row, this.col, currentTurn);        // update the DOM
+                board[row][this.col] = currentTurn;           // update the memory
+                drawPiece(row, this.col, currentTurn);                  // update the DOM
                 if (checkWin(this.row, this.col)) {
                     winnerModal(currentTurn);
-                    alert(`${currentTurn.toUpperCase()} wins!`);
+                    alert(`${currentTurn} wins!`);
                 }
                 currentTurn === player1 ? player2 : player1;  // Switch player
                 break;
@@ -215,11 +227,12 @@ const GAME = (function () {
     // Draws the piece on top of the circle in the row and column
     function drawPiece(col, row, curPlayerId) {
         const x = col * colWidth + offset,
-              y = row * colWidth + offset,
-              color = curPlayerId === player1 ? "red" : "yellow";
+              y = row * colWidth + offset;
+        
+        console.log(`${curPlayerId} place the piece in position x=${row} y=${col}`);
 
         // adding the piece to the 'played_{col}' so the transparent box is on top of the piece.
-        const piece = `<circle cx="${x}" cy="${y}" r="${pieceRadius}" class="${color}" />`;
+        const piece = `<circle cy="${x}" cx="${y}" r="${pieceRadius}" class="${myColor}" />`;
         $(`played_${col}`).innerHTML += piece;
     }
 
@@ -249,7 +262,7 @@ const GAME = (function () {
         for (let i = -3; i <= 3; i++) {
             const r = row + i * rowDir;
             const c = col + i * colDir;
-            if (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[r][c] === currentPlayer) {
+            if (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[r][c] === currentTurn) {
                 count++;
                 if (count === 4) { return true };
             } else {
@@ -264,11 +277,11 @@ const GAME = (function () {
      * @param {String} winner - Currently just a string of the color.
      */
     function winnerModal(winner) {
-        const modal = createElement(`div`);
+        const modal = document.createElement(`div`);
         modal.setAttribute(`id`, `winnnerModal`);
         
-        const title = createElement(`h2`);
-        title.textContent = `${winner} has won the game!`;
+        const title = document.createElement(`h2`);
+        title.innerHTML = `${winner} has won the game!`;
 
         modal.appendChild(title);
         $(`winner`).appendChild(modal);
