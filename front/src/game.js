@@ -213,10 +213,11 @@ const GAME = (function () {
             this.row = row;
             if (!board[row][this.col]) {
                 board[row][this.col] = currentTurn;           // update the memory
-                drawPiece(row, this.col, currentTurn);                  // update the DOM
+                drawPiece(row, this.col, currentTurn);        // update the DOM
+                console.log(board);
                 if (checkWin(this.row, this.col)) {
                     winnerModal(currentTurn);
-                    alert(`${currentTurn} wins!`);
+                    // alert(`${currentTurn} wins!`);
                 }
                 currentTurn === player1 ? player2 : player1;  // Switch player
                 break;
@@ -225,15 +226,19 @@ const GAME = (function () {
     }
 
     // Draws the piece on top of the circle in the row and column
-    function drawPiece(col, row, curPlayerId) {
-        const x = col * colWidth + offset,
-              y = row * colWidth + offset;
+    function drawPiece(row, col, curPlayerId) {
+        const circle = $(`cell_${col}_${row}`);
+        console.log(circle);
         
-        console.log(`${curPlayerId} place the piece in position x=${row} y=${col}`);
-
-        // adding the piece to the 'played_{col}' so the transparent box is on top of the piece.
-        const piece = `<circle cy="${x}" cx="${y}" r="${pieceRadius}" class="${myColor}" />`;
-        $(`played_${col}`).innerHTML += piece;
+        if (userId == player1 && curPlayerId == player1) {
+            circle.setAttribute(`class`, myColor);
+        } else if (userId == player2 && curPlayerId == player1) {
+            circle.setAttribute(`class`, otherColor);
+        } else if (userId == player1 && curPlayerId == player2) {
+            circle.setAttribute(`class`, otherColor);
+        } else if (userId == player2 && curPlayerId == player2) {
+            circle.setAttribute(`class`, myColor);
+        }
     }
 
     /**
