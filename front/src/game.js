@@ -75,8 +75,6 @@ const GAME = (function () {
         player2 = response.player2_id;
         currentTurn = response.current_turn;
 
-        console.log(userId == player2);
-
         if (userId && userId == player1) {
             myColor = "red";
             otherColor = 'yellow';
@@ -208,7 +206,6 @@ const GAME = (function () {
 
     // When you drag the piece over the column and let go, it will drop the piece in the column to the first empty place
     ClearCol.prototype.placePiece = function () {
-        console.log(this.col);
         for (let row = ROWS - 1; row >= 0; row--) {
             this.row = row;
             if (!board[row][this.col]) {
@@ -219,7 +216,12 @@ const GAME = (function () {
                     winnerModal(currentTurn);
                     // alert(`${currentTurn} wins!`);
                 }
-                currentTurn === player1 ? player2 : player1;  // Switch player
+                if(currentTurn == player1) {
+                    currentTurn = player2;
+                } else if (currentTurn == player2) {
+                    currentTurn = player1;
+                }
+                console.log(`currentTurn: ${currentTurn}`);
                 break;
             }
         }
@@ -228,8 +230,7 @@ const GAME = (function () {
     // Draws the piece on top of the circle in the row and column
     function drawPiece(row, col, curPlayerId) {
         const circle = $(`cell_${col}_${row}`);
-        console.log(circle);
-        
+        console.log(userId, curPlayerId);
         if (userId == player1 && curPlayerId == player1) {
             circle.setAttribute(`class`, myColor);
         } else if (userId == player2 && curPlayerId == player1) {
