@@ -213,8 +213,8 @@ async function getGameInformation(gameId) {
     return response;
 }
 
-async function updateGameState(gameState, gameId) {
-    const response = DB.updateGameState(gameState, gameId);
+async function updateGameState(gameState, currentTurn, gameId) {
+    const response = DB.updateGameState(gameState, currentTurn, gameId);
     return response;
 }
 

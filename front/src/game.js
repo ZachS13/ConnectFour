@@ -220,7 +220,7 @@ const GAME = (function () {
     }
 
     // When you drag the piece over the column and let go, it will drop the piece in the column to the first empty place
-    ClearCol.prototype.placePiece = function () {
+    ClearCol.prototype.placePiece = async function () {
         for (let row = ROWS - 1; row >= 0; row--) {
             if (currentTurn != userId) {
                 console.log(currentTurn, userId);
@@ -229,18 +229,18 @@ const GAME = (function () {
             }
             this.row = row;
             if (!board[row][this.col]) {
-                // board[row][this.col] = currentTurn;           // update the memory
+                board[row][this.col] = currentTurn;           // update the memory
                 // drawPiece(row, this.col, currentTurn);        // update the DOM
                 console.log(board);
                 const message = {
                     gameId: gameId,
                     row: row,
                     col: this.col,
-                    turn: currentTurn
+                    turn: currentTurn,
+                    gameState: board,
                 }
                 console.log(message);
                 socket.emit("makeMove", message);               // Send the move to the user and will draw using the drawPiece function.
-                sendToTheDatabase();                            // Update the database using the board.
                 break;
             }
         }
@@ -375,14 +375,25 @@ const GAME = (function () {
         });
 
         if (!response.ok) {
-            console.log('There was an error getting the oppenets username.');
+            console.error('There was an error getting the oppenets username.');
         }
         response = await response.json();
         return response.message;
     }
 
     async function sendToTheDatabase() {
-        console.log("Not Implemented Yet!");
+        let response = await fetch(`http${API_URL}/updateGameState`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ gameState: board, gameId: gameId })
+        });
+
+        if (!response.ok) {
+            console.error('There was an error updating the game state.');
+        }
+        response = await response.json();
+        console.log(response);
+        return response.message;
     }
 
 

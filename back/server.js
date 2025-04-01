@@ -168,19 +168,6 @@ app.post('/getGameInformation', async (req, res) => {
     }
 });
 
-app.post('/updateGameState', async (req, res) => {
-    const { gameState, gameId } = req.body;
-    try {
-        const response = await logic.updateGameState(gameState, gameId);
-        if(!response || response === undefined) {
-            return res.status(404).json({ error: "Game State was not updated!" });
-        } 
-        return res.status(200).json({ message: response });
-    } catch (error) {
-        return res.status(500).json({ error: "An error occured updating the gameState!" });
-    }
-});
-
 
 // Using socket.io this is where handling lobby chat, game chat, game moves, and challenges will be handled.
 let userSockets = new Map();  // Map to store user IDs to their sockets
@@ -263,7 +250,7 @@ io.on('connection', (socket) => {
     });
 
 
-    socket.on('makeMove', (data) => {
+    socket.on('makeMove', async (data) => {
         if (socket.rooms.has(data.gameId)) {
             const message = {
                 gameId: data.gameId,
@@ -271,7 +258,13 @@ io.on('connection', (socket) => {
                 col: data.col,
                 turn: data.turn
             };
-            io.to(data.gameId).emit('makeMove', message);
+            const gameState = data.gameState,
+                  gameId = data.gameId,
+                  currentTurn = data.turn;
+            const response = await logic.updateGameState(gameState, currentTurn,  gameId);
+            if(response) {
+                io.to(data.gameId).emit('makeMove', message);
+            }
         } else {
             socket.emit('error', { error: "Game room does not exist" });
         }

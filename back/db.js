@@ -169,7 +169,7 @@ async function sendChallengeResponse(challengeId, reply) {
  * @returns 
  */
 async function createConnectFourGame(player1, player2, currentTurn, createdAt, gameState) {
-    const [result] = await pool.execute(`INSERT INTO game (player1_id, player2_id, current_turn, created_at, game_state) VALUES (?, ?, ?, ?, ?)`, [player1, player2, currentTurn, createdAt, gameState]);
+    const [result] = await pool.execute(`INSERT INTO game (player1_id, player2_id, current_turn, created_at, game_state) VALUES (?, ?, ?, ?, ?);`, [player1, player2, currentTurn, createdAt, gameState]);
     return result.insertId;
 }
 
@@ -179,8 +179,10 @@ async function getGameInformation(gameId) {
     return result[0];
 }
 
-async function updateGameState(gameId, gameState) {
-    const [result] = await pool.execute(`UPDATE game SET game_state = ? WHERE game_id`, [gameState, gameId]);
+async function updateGameState(gameState, currentTurn, gameId) {
+    console.table(gameState);
+    console.log(gameId);
+    const [result] = await pool.execute(`UPDATE game SET game_state = ?, current_turn = ? WHERE game_id = ?;`, [JSON.stringify(gameState), currentTurn, gameId]);
     return result.affectedRows > 0;
 }
 
