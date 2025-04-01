@@ -110,12 +110,9 @@ app.post(`/checkSession`, async (req, res) => {
     const { userId, sessionId } = req.body;
     try {
         const clientIp = getClientIp(req);
-        const username = await logic.getUsernameById(userId);
-        const token = logic.createSessionToken(clientIp, userId, username);
-        
-        // Get the stored session checksum
-        const storedToken = await logic.getSessionTokenWithIdUserId(sessionId, userId);
-        if (!storedToken || storedToken !== token) {
+        console.log(clientIp);
+        const username = validateSession(sessionId, clientIp, userId);
+        if (!username) {
             return res.status(401).json({ error: `Session is not verified!` });
         } 
 
@@ -127,7 +124,14 @@ app.post(`/checkSession`, async (req, res) => {
 
 // Send challenge to a specfied user.
 app.post(`/sendChallenge`, async (req,res) => {
-    const { userId, challengerId } = req.body;
+    const { sessionId, userId, challengerId } = req.body;
+
+    const ip = clientIp(req);
+    const sessionValid = await validateSession(sessionId, ip, userId);
+
+    if(!sessionValid) {
+        return res.status(401).json({ error: "Unauthorized Request" });
+    }
     try {
         const challengeId = await logic.sendChallenge(userId, challengerId);
         if (!challengeId) {
@@ -141,7 +145,15 @@ app.post(`/sendChallenge`, async (req,res) => {
 
 // Reply to a challenge.
 app.post(`/challengeResponse`, async (req, res) => {
-    const { challengeId, reply } = req.body;
+    const { sessionId, challengeId, reply } = req.body;
+
+    const ip = clientIp(req);
+    const sessionValid = await validateSession(sessionId, ip, userId);
+
+    if (!sessionValid) {
+        return res.status(401).json({ error: "Unauthorized Request" });
+    }
+
     try {
         const response = logic.sendChallengeResponse(challengeId, reply);
         if(!response) {
@@ -155,8 +167,15 @@ app.post(`/challengeResponse`, async (req, res) => {
 
 // Get the game board for a specific game.
 app.post('/getGameInformation', async (req, res) => {
-    const { gameId } = req.body;
+    const { sessionId, gameId } = req.body;
     console.log(`Game Id: ${gameId}`);
+
+    const ip = clientIp(req);
+    const sessionValid = await validateSession(sessionId, ip, userId);
+    if (!sessionValid) {
+        return res.status(401).json({ error: "Unauthorized Request" });
+    }
+    
     try {
         const response = await logic.getGameInformation(gameId);
         if (!response || response === undefined) {
@@ -167,6 +186,17 @@ app.post('/getGameInformation', async (req, res) => {
         return res.status(500).json({ error: "An error occured getting the game board!" });
     }
 });
+
+async function validateSession(sessionId, ip, userId) {
+    const username = await logic.getUsernameById(userId);
+    const token = logic.createSessionToken(ip, userId, username);
+    
+    const storedToken = await logic.getSessionTokenWithIdUserId(sessionId, userId);
+    if (!storedToken || storedToken !== token) {
+        return username;
+    }
+    return null;
+}
 
 
 // Using socket.io this is where handling lobby chat, game chat, game moves, and challenges will be handled.
