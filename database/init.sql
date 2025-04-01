@@ -56,15 +56,3 @@ CREATE TABLE game (
     FOREIGN KEY (winner_id) REFERENCES users(user_id),
     CHECK (player1_id != player2_id)
 );
-
-CREATE TABLE move (
-    move_id     INT         PRIMARY KEY AUTO_INCREMENT,
-    game_id     INT,
-    player_id   INT,
-    column_num  INT,
-    move_num    INT,
-    move_time   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (game_id) REFERENCES game(game_id) ON DELETE CASCADE,
-    FOREIGN KEY (player_id) REFERENCES users(user_id),
-    CHECK (column_num BETWEEN 0 AND 6)
-);
