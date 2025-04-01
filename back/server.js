@@ -262,11 +262,26 @@ io.on('connection', (socket) => {
                   gameId = data.gameId,
                   currentTurn = data.turn;
             const response = await logic.updateGameState(gameState, currentTurn,  gameId);
-            if(response) {
-                io.to(data.gameId).emit('makeMove', message);
+            if (response) {
+                io.to(gameId).emit('makeMove', message);
             }
         } else {
             socket.emit('error', { error: "Game room does not exist" });
+        }
+    });
+
+    socket.on('winner', async (data) => {
+        if (socket.rooms.has(data.gameId)) {
+            const gameId = data.gameId,
+                  winnerId = data.winnerId;
+            const message = {
+                gameId: gameId,
+                winnerId: winnerId
+            }
+            const response = await logic.updateGameWinner(winnerId, gameId);
+            if (response) {
+                io.to(gameId).emit('winner', message);
+            }
         }
     });
 

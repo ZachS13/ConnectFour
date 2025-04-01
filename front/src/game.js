@@ -63,7 +63,8 @@ const GAME = (function () {
         currentTurn,            // Who's turn it is (user_id).
         myColor,                // Player 1 = RED, Player 2 = YELLOW.
         otherColor,             // Opposite of the my color.
-        oppUsername;            // What is the opponents username.
+        oppId,                  // Opponents UserId.
+        oppUsername;            // Opponents username.
 
 
     // Creates the empty board (2d array full of null values)
@@ -79,11 +80,13 @@ const GAME = (function () {
         if (userId && userId == player1) {
             myColor = "red";
             otherColor = 'yellow';
-            oppUsername = await getOpponentUsername(player2);
+            oppId = player2;
+            oppUsername = await getOpponentUsername(oppId);
         } else if (userId && userId == player2) {
             myColor = "yellow";
             otherColor = "red";
-            oppUsername = await getOpponentUsername(player1);
+            oppId = player1;
+            oppUsername = await getOpponentUsername(oppId);
         } else {
             window.location = './lobby.html';
         }
@@ -99,6 +102,10 @@ const GAME = (function () {
 
             console.log(data);
             drawPiece(row, col, turn);
+        });
+
+        socket.on("winner", (data) => {
+            winnerModal(data.winnerId);
         });
     }
 
@@ -261,19 +268,23 @@ const GAME = (function () {
             circle.setAttribute(`class`, myColor);
         }
 
-        if (currentTurn == player1) {
-            currentTurn = player2;
-        } else if (currentTurn == player2) {
-            currentTurn = player1;
-        }
-        console.log(`currentTurn: ${currentTurn}`);
-
         if (checkWin(row, col)) {
-            winnerModal(currentTurn);
-            // alert(`${currentTurn} wins!`);
+            const message = {
+                gameId: gameId, 
+                winnerId: currentTurn,
+            }
+            socket.emit('winner', message);
+            currentTurn = "gameover";
         } else {
+            if (currentTurn == player1) {
+                currentTurn = player2;
+            } else if (currentTurn == player2) {
+                currentTurn = player1;
+            }
+
             updateWhosTurn(currentTurn);
         }
+
         console.log(`currentTurn: ${currentTurn}`);
     }
 
@@ -322,7 +333,13 @@ const GAME = (function () {
         modal.setAttribute(`id`, `winnnerModal`);
         
         const title = document.createElement(`h2`);
-        title.innerHTML = `${winner} has won the game!`;
+        if (winner == userId) {
+            title.innerHTML = `${username} has won the game!`;
+            title.style.color = "green";
+        } else {
+            title.innerHTML = `${oppUsername} has won the game!`;
+            title.style.color = "red";
+        }
 
         modal.appendChild(title);
         $(`winner`).appendChild(modal);
@@ -337,9 +354,11 @@ const GAME = (function () {
         if (currentTurn == userId) {
             turnDisplay.innerHTML = `It's your turn!`;
             turnDisplay.style.color = myColor;
-        } else {
+        } else if(currentTurn == oppId) {
             turnDisplay.innerHTML = `It's ${oppUsername}'s turn!`;
             turnDisplay.style.color = otherColor;
+        } else if(currentTurn === "gameover") {
+            turnDisplay.innerHTML = "";
         }
     }
 
@@ -380,22 +399,6 @@ const GAME = (function () {
         response = await response.json();
         return response.message;
     }
-
-    async function sendToTheDatabase() {
-        let response = await fetch(`http${API_URL}/updateGameState`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ gameState: board, gameId: gameId })
-        });
-
-        if (!response.ok) {
-            console.error('There was an error updating the game state.');
-        }
-        response = await response.json();
-        console.log(response);
-        return response.message;
-    }
-
 
     return {
         init: init,

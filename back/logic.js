@@ -6,6 +6,7 @@
  * sanitization, decoding tokens, etc.
  */
 
+const { response } = require('express');
 const DB = require(`./db.js`),
       bcrypt = require('bcrypt'), 
       crypto = require('crypto');
@@ -218,6 +219,11 @@ async function updateGameState(gameState, currentTurn, gameId) {
     return response;
 }
 
+async function updateGameWinner(winnerId, gameId) {
+    const response = DB.updateGameWinner(winnerId, gameId);
+    return response;
+}
+
 /**
  * VALIDATION AND SANITIZATION OF ALL THE PARAMETERS BEING SENT TO THE DATABASE
  * MAKES SURE ALL OF THE VALUES ARE IN THE CORRECT FORM AND CANNOT DAMAGE
@@ -330,4 +336,6 @@ module.exports = {
     createConnectFourGame,
     getGameInformation,
     updateGameState,
+    updateGameWinner,
+    
 };

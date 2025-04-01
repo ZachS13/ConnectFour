@@ -180,9 +180,12 @@ async function getGameInformation(gameId) {
 }
 
 async function updateGameState(gameState, currentTurn, gameId) {
-    console.table(gameState);
-    console.log(gameId);
     const [result] = await pool.execute(`UPDATE game SET game_state = ?, current_turn = ? WHERE game_id = ?;`, [JSON.stringify(gameState), currentTurn, gameId]);
+    return result.affectedRows > 0;
+}
+
+async function updateGameWinner(winnerId, gameId) {
+    const [result] = await pool.execute(`UPDATE game SET winner_id = ? WHERE game_id = ?;`, [winnerId, gameId]);
     return result.affectedRows > 0;
 }
 
@@ -205,4 +208,5 @@ module.exports = {
     createConnectFourGame,
     getGameInformation,
     updateGameState,
+    updateGameWinner,
 };
