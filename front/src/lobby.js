@@ -85,7 +85,7 @@ const LOBBY = (function () {
                 challengeMsg.appendChild(denyButton);
 
                 acceptButton.addEventListener('click', async () => {
-                    const reply = await sendChallengeResponse(data.challengeId, "accept"),
+                    const reply = await sendChallengeResponse(sessionId, data.challengeId, "accept"),
                           sendAccept= {
                               userId: userId,
                               action: "acceptChallenge",
@@ -99,7 +99,7 @@ const LOBBY = (function () {
                 });
 
                 denyButton.addEventListener('click', async () => {
-                    const reply = await sendChallengeResponse(data.challengeId, "decline"),
+                    const reply = await sendChallengeResponse(sessionId, data.challengeId, "decline"),
                            sendDecline = {
                                 userId: userId,
                                 action: "declineChallenge",
@@ -172,7 +172,7 @@ const LOBBY = (function () {
             if (!challengeMessage) {
                 challengeMessage = `I challenge you to a game!`;
             }
-            const challengeId = await sendChallengeToDB(userId, targetUserId);
+            const challengeId = await sendChallengeToDB(sessionId, userId, targetUserId);
             console.log(challengeId);
             const message = {
                 userId: userId,
@@ -258,11 +258,11 @@ const LOBBY = (function () {
      * @param {Integer} challengerId - Who they want to play against.
      * @returns {Integer} - ID of the challenge in the DB.
      */
-    async function sendChallengeToDB(userId, challengerId) {
+    async function sendChallengeToDB(sessionId, userId, challengerId) {
         const response = await fetch(`http${API_URL}/sendChallenge`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId, challengerId })
+            body: JSON.stringify({ sessionId, userId, challengerId })
         });
 
         if (response.error || !response) {
@@ -278,11 +278,11 @@ const LOBBY = (function () {
      * @param {Object} reply - Object of the reply to the challenge.
      * @returns Rseponse from the database.
      */
-    async function sendChallengeResponse(challengeId, reply) {
+    async function sendChallengeResponse(sessionId, challengeId, reply) {
         const response = await fetch(`http${API_URL}/challengeResponse`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ challengeId, reply })
+            body: JSON.stringify({ sessionId, challengeId, reply })
         });
 
         if(!response || !response) {

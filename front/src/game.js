@@ -74,7 +74,7 @@ const GAME = (function () {
      */
     async function init() {
         // Get the board from the database, should just be an empty 6x7 2d array.
-        let response = await getGameInformation(gameId);
+        let response = await getGameInformation(sessionId, gameId);
         console.log(response);
         board = response.game_state;
         player1 = response.player1_id;
@@ -376,11 +376,11 @@ const GAME = (function () {
      * @param {Integer} gameId - Game_id of the current game being played.
      * @returns Response from the server with the game information on the specific game_id.
      */
-    async function getGameInformation(gameId) {
+    async function getGameInformation(sessionId, gameId) {
         let response = await fetch(`http${API_URL}/getGameInformation`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ gameId })
+            body: JSON.stringify({ sessionId, gameId })
         });
 
         if (!response.ok) {
