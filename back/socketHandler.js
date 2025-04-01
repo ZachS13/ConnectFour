@@ -21,11 +21,11 @@ async function handleLobbyChatMessages(io, userId, action, room, message) {
 /**
  * Handles sending the challenge from the user to the recipiant.
  * @param {IO} io - Socket IO object
- * @param {*} userId - UserId of the sender of the challenge.
- * @param {*} targetUserId - UserId recieving the challenge.
- * @param {*} targetUserSocketId - SocketId of the user recieving the challenge.
- * @param {*} challengeId - ChallengeId.
- * @param {*} message - Message attached to the challenge.
+ * @param {Integer} userId - UserId of the sender of the challenge.
+ * @param {Integer} targetUserId - UserId recieving the challenge.
+ * @param {Integer} targetUserSocketId - SocketId of the user recieving the challenge.
+ * @param {Integer} challengeId - ChallengeId.
+ * @param {String} message - Message attached to the challenge.
  */
 function handleSendingChallenge(io, userId, targetUserSocketId, challengeId, message) {
     const challengeMessage = {
@@ -40,11 +40,11 @@ function handleSendingChallenge(io, userId, targetUserSocketId, challengeId, mes
 /**
  * Handles accepting the challenge. Sending the accept to the database and then back to the user.
  * @param {IO} io - Socket IO object
- * @param {*} senderId - UserId of the sender of the challenge.
- * @param {*} senderSocketId - SocketId of who sent the challenge.
- * @param {*} targetId - UserId of who is accepting the challenge.
- * @param {*} targetUserSocketId - SocketId of who is accepting the challenge.
- * @param {*} challengeId - Challenge Id.
+ * @param {Integer} senderId - UserId of the sender of the challenge.
+ * @param {Integer} senderSocketId - SocketId of who sent the challenge.
+ * @param {Integer} targetId - UserId of who is accepting the challenge.
+ * @param {Integer} targetUserSocketId - SocketId of who is accepting the challenge.
+ * @param {Integer} challengeId - Challenge Id.
  */
 async function handleAcceptChallenge(io, senderId, senderSocketId, targetId, targetUserSocketId, challengeId) {
     const gameId = await logic.createConnectFourGame(senderId, targetId);
@@ -62,9 +62,9 @@ async function handleAcceptChallenge(io, senderId, senderSocketId, targetId, tar
 /**
  * 
  * @param {IO} io - Socket IO object. 
- * @param {*} declineUserId - UserId of who declined the challenge.
- * @param {*} targetUserSocketId - Socket Id of who the decline message is being sent to.
- * @param {*} challengeId - Challenge Id.
+ * @param {Integer} declineUserId - UserId of who declined the challenge.
+ * @param {Integer} targetUserSocketId - Socket Id of who the decline message is being sent to.
+ * @param {Integer} challengeId - Challenge Id.
  */
 function handleDeclineChallenge(io, declineUserId, targetUserSocketId, challengeId) {
     const declineChallengeMessage = {
