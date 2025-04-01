@@ -7,7 +7,7 @@ body {
     height: 100vh;
     margin: 0;
     padding: 0;
-    background-color: #f2f2f2;
+    background-color: #666666;
 }
 
 .container {
@@ -147,14 +147,14 @@ svg {
 
 .red {
     fill: red;
-    stroke: white;
-    stroke-width: 1px;
+    stroke: blue;
+    stroke-width: 5px;
 }
 
 .yellow {
     fill: yellow;
-    stroke: white;
-    stroke-width: 1px;
+    stroke: blue;
+    stroke-width: 5px;
 }
 
 .cell {

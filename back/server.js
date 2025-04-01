@@ -255,6 +255,7 @@ io.on('connection', (socket) => {
                 gameId: data.gameId,
                 row: data.row,
                 col: data.col,
+                turn: data.turn
             };
             io.to(data.gameId).emit('makeMove', message);
         } else {

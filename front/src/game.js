@@ -62,7 +62,8 @@ const GAME = (function () {
         player2,                // Player 2 for the game.
         currentTurn,            // Who's turn it is (user_id).
         myColor,                // Player 1 = RED, Player 2 = YELLOW.
-        otherColor;             // Opposite of the my color.
+        otherColor,             // Opposite of the my color.
+        oppUsername;            // What is the opponents username.
 
 
     // Creates the empty board (2d array full of null values)
@@ -78,13 +79,27 @@ const GAME = (function () {
         if (userId && userId == player1) {
             myColor = "red";
             otherColor = 'yellow';
+            oppUsername = await getOpponentUsername(player2);
         } else if (userId && userId == player2) {
             myColor = "yellow";
             otherColor = "red";
+            oppUsername = await getOpponentUsername(player1);
+        } else {
+            window.location = './lobby.html';
         }
 
         console.log(board, player1, player2, currentTurn);
         drawBoard();
+        updateWhosTurn();
+
+        socket.on("makeMove", (data) => {
+            const row = data.row,
+                  col = data.col,
+                  turn = data.turn;
+
+            console.log(data);
+            drawPiece(row, col, turn);
+        });
     }
 
     // Draws the board.
@@ -207,21 +222,25 @@ const GAME = (function () {
     // When you drag the piece over the column and let go, it will drop the piece in the column to the first empty place
     ClearCol.prototype.placePiece = function () {
         for (let row = ROWS - 1; row >= 0; row--) {
+            if (currentTurn != userId) {
+                console.log(currentTurn, userId);
+                alert("NOT YOUR TURN!");
+                break;
+            }
             this.row = row;
             if (!board[row][this.col]) {
-                board[row][this.col] = currentTurn;           // update the memory
-                drawPiece(row, this.col, currentTurn);        // update the DOM
+                // board[row][this.col] = currentTurn;           // update the memory
+                // drawPiece(row, this.col, currentTurn);        // update the DOM
                 console.log(board);
-                if (checkWin(this.row, this.col)) {
-                    winnerModal(currentTurn);
-                    // alert(`${currentTurn} wins!`);
+                const message = {
+                    gameId: gameId,
+                    row: row,
+                    col: this.col,
+                    turn: currentTurn
                 }
-                if(currentTurn == player1) {
-                    currentTurn = player2;
-                } else if (currentTurn == player2) {
-                    currentTurn = player1;
-                }
-                console.log(`currentTurn: ${currentTurn}`);
+                console.log(message);
+                socket.emit("makeMove", message);               // Send the move to the user and will draw using the drawPiece function.
+                sendToTheDatabase();                            // Update the database using the board.
                 break;
             }
         }
@@ -230,7 +249,8 @@ const GAME = (function () {
     // Draws the piece on top of the circle in the row and column
     function drawPiece(row, col, curPlayerId) {
         const circle = $(`cell_${col}_${row}`);
-        console.log(userId, curPlayerId);
+        board[row][col] = currentTurn;
+
         if (userId == player1 && curPlayerId == player1) {
             circle.setAttribute(`class`, myColor);
         } else if (userId == player2 && curPlayerId == player1) {
@@ -240,6 +260,21 @@ const GAME = (function () {
         } else if (userId == player2 && curPlayerId == player2) {
             circle.setAttribute(`class`, myColor);
         }
+
+        if (currentTurn == player1) {
+            currentTurn = player2;
+        } else if (currentTurn == player2) {
+            currentTurn = player1;
+        }
+        console.log(`currentTurn: ${currentTurn}`);
+
+        if (checkWin(row, col)) {
+            winnerModal(currentTurn);
+            // alert(`${currentTurn} wins!`);
+        } else {
+            updateWhosTurn(currentTurn);
+        }
+        console.log(`currentTurn: ${currentTurn}`);
     }
 
     /**
@@ -294,6 +329,21 @@ const GAME = (function () {
     }
 
     /**
+     * Update Who's turn it is to play.
+     */
+    function updateWhosTurn() {
+        const turnDisplay = $(`whosTurn`);
+
+        if (currentTurn == userId) {
+            turnDisplay.innerHTML = `It's your turn!`;
+            turnDisplay.style.color = myColor;
+        } else {
+            turnDisplay.innerHTML = `It's ${oppUsername}'s turn!`;
+            turnDisplay.style.color = otherColor;
+        }
+    }
+
+    /**
      * Sends a request to the API to get the game information of the specific game_id.
      * @param {Integer} gameId - Game_id of the current game being played.
      * @returns Response from the server with the game information on the specific game_id.
@@ -305,12 +355,36 @@ const GAME = (function () {
             body: JSON.stringify({ gameId })
         });
 
-        if (!response || response === undefined) {
+        if (!response.ok) {
             console.log('There was an error getting the game information.');
         }
         response = await response.json();
         return response.message;
     }
+
+    /**
+     * Get you oppenents username with their userId.
+     * @param {integer} oppUserId - Opponent's userId.
+     * @returns Opponent's username.
+     */
+    async function getOpponentUsername(oppUserId) {
+        let response = await fetch(`http${API_URL}/getUsername`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: oppUserId })
+        });
+
+        if (!response.ok) {
+            console.log('There was an error getting the oppenets username.');
+        }
+        response = await response.json();
+        return response.message;
+    }
+
+    async function sendToTheDatabase() {
+        console.log("Not Implemented Yet!");
+    }
+
 
     return {
         init: init,
