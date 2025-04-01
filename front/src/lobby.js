@@ -28,9 +28,13 @@ try {
     window.location = './login.html';
 }
 
-
+/**
+ * Handles all of the logic for sending lobby chats, challenges, accepting, and denying challenges.
+ */
 const LOBBY = (function () {
-
+    /**
+     * Initializes the lobby page.
+     */
     function init() {
         dropDownWithUsernames();
         const socket = io(`http${API_URL}`, {

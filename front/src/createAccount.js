@@ -1,7 +1,13 @@
+/**
+ * Helper function to send the user to the login page.
+ */
 function loginPage() {
     window.location.href = "./login.html";
 }
 
+/**
+ * Initalizes the create account page.
+ */
 function init() {
     document.getElementById('signup').addEventListener('submit', async function (event) {
         event.preventDefault(); // Stop the form from navigating away

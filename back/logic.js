@@ -144,6 +144,11 @@ async function sendLobbyMessage(senderId, message) {
     return response;
 }
 
+/**
+ * Get the sender id and the challege id for the given challenge.
+ * @param {Integer} challengeId - ChallengeId looking for.
+ * @returns - Information about the given challenge.
+ */
 async function getChallengeWithId(challengeId) {
     const response = await DB.getChallengeWithId(challengeId);
     return response;
@@ -180,8 +185,8 @@ async function sendChallengeResponse(challengeId, reply) {
 }
 
 /**
- * With the given players, create the other default information and send it to the database,
- * returning the insert id of the game.
+ * With the given players, create the other default information (current time and a 6x7 empty 2d array) 
+ * and send it to the database, returning the insert id of the game.
  * @param {Integer} player1 - UserId of one of the players (Who sent the game challenge).
  * @param {Integer} player2 - UserId of the other (Who accepted the challenge).
  * @returns The gameId of the game created in the database.
@@ -214,11 +219,24 @@ async function getGameInformation(gameId) {
     return response;
 }
 
+/**
+ * Update the game_state and the current_turn in the database.
+ * @param {Array<Array<Integer>>} gameState - 2D array of who's turn it is.
+ * @param {Integer} currentTurn - UserId of who's turn it is.
+ * @param {Integer} gameId - Game Id the game_state is being updated.
+ * @returns True or False, Was the game_state and current_turn updated?
+ */
 async function updateGameState(gameState, currentTurn, gameId) {
     const response = DB.updateGameState(gameState, currentTurn, gameId);
     return response;
 }
 
+/**
+ * Update the database with the winner of the game.
+ * @param {Integer} winnerId - UserId of the winner of the game.
+ * @param {Integer} gameId - Game Id 
+ * @returns True or False, Was the winner of the game updated?
+ */
 async function updateGameWinner(winnerId, gameId) {
     const response = DB.updateGameWinner(winnerId, gameId);
     return response;
@@ -337,5 +355,5 @@ module.exports = {
     getGameInformation,
     updateGameState,
     updateGameWinner,
-    
+
 };

@@ -160,30 +160,47 @@ async function sendChallengeResponse(challengeId, reply) {
 /////////////////////////////
 
 /**
- * 
+ * Creates the game in the dataabse, sets all of the values (player1, player2, currentTurn) to the default.
  * @param {Integer} player1 - UserId of the player that sent the challenge.
  * @param {Integer} player2 - UserId of the player that accepted the challenge.
  * @param {Integer} currentTurn - Defaultly player1_id.
  * @param {Date} createdAt - Usually the current data and time.
- * @param {Array} gameState - 6x7 empty 2d array.
- * @returns 
+ * @param {Array<Array<null>>} gameState - 6x7 empty 2d array.
+ * @returns GameId of the game created.
  */
 async function createConnectFourGame(player1, player2, currentTurn, createdAt, gameState) {
     const [result] = await pool.execute(`INSERT INTO game (player1_id, player2_id, current_turn, created_at, game_state) VALUES (?, ?, ?, ?, ?);`, [player1, player2, currentTurn, createdAt, gameState]);
     return result.insertId;
 }
 
+/**
+ * Gets the gameBoard of the gameId given.
+ * @param {Integer} gameId - gameId of the game board you want to get.
+ */
 async function getGameInformation(gameId) {
     const [result] = await pool.execute(`SELECT game_state, player1_id, player2_id, current_turn FROM game WHERE game_id = ? LIMIT 1;`, [gameId]);
     if (result.length === 0) return null;
     return result[0];
 }
 
+/**
+ * Update the game_state and the current_turn in the database.
+ * @param {Array<Array<Integer>>} gameState - 2D array of who's turn it is.
+ * @param {Integer} currentTurn - UserId of who's turn it is.
+ * @param {Integer} gameId - Game Id the game_state is being updated.
+ * @returns True or False, Was the game_state and current_turn updated?
+ */
 async function updateGameState(gameState, currentTurn, gameId) {
     const [result] = await pool.execute(`UPDATE game SET game_state = ?, current_turn = ? WHERE game_id = ?;`, [JSON.stringify(gameState), currentTurn, gameId]);
     return result.affectedRows > 0;
 }
 
+/**
+ * Update the database with the winner of the game.
+ * @param {Integer} winnerId - UserId of the winner of the game.
+ * @param {Integer} gameId - Game Id 
+ * @returns True or False, Was the winner of the game updated?
+ */
 async function updateGameWinner(winnerId, gameId) {
     const [result] = await pool.execute(`UPDATE game SET winner_id = ? WHERE game_id = ?;`, [winnerId, gameId]);
     return result.affectedRows > 0;

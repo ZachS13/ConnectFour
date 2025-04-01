@@ -47,7 +47,9 @@ function $(id) {
     return document.getElementById(id);
 }
 
-// GAME will hold all of the game logic, placing the piece, checking for wins, etc.
+/**
+ * GAME will hold all of the game logic, placing the piece, checking for wins, etc.
+ */
 const GAME = (function () {
     const COLS = 7,                         // number columns       (7 is the normal board)
           ROWS = 6,                         // number rows          (6 is the normal board)
@@ -67,7 +69,9 @@ const GAME = (function () {
         oppUsername;            // Opponents username.
 
 
-    // Creates the empty board (2d array full of null values)
+    /**
+     * Initializes the board with the given game_state from the database.
+     */
     async function init() {
         // Get the board from the database, should just be an empty 6x7 2d array.
         let response = await getGameInformation(gameId);
@@ -253,7 +257,12 @@ const GAME = (function () {
         }
     }
 
-    // Draws the piece on top of the circle in the row and column
+    /**
+     * Takes the circle object created in the drawBoard and changes the color.
+     * @param {Integer} row - First available row for the piece to go in.
+     * @param {Integer} col - Column that the piece was placed in.
+     * @param {Integer} curPlayerId - UserId of whos turn it is.
+     */
     function drawPiece(row, col, curPlayerId) {
         const circle = $(`cell_${col}_${row}`);
         board[row][col] = currentTurn;

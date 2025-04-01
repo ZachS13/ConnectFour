@@ -37,6 +37,15 @@ function handleSendingChallenge(io, userId, targetUserSocketId, challengeId, mes
     io.to(targetUserSocketId).emit("lobbyMessage", challengeMessage);
 }
 
+/**
+ * Handles accepting the challenge. Sending the accept to the database and then back to the user.
+ * @param {IO} io - Socket IO object
+ * @param {*} senderId - UserId of the sender of the challenge.
+ * @param {*} senderSocketId - SocketId of who sent the challenge.
+ * @param {*} targetId - UserId of who is accepting the challenge.
+ * @param {*} targetUserSocketId - SocketId of who is accepting the challenge.
+ * @param {*} challengeId - Challenge Id.
+ */
 async function handleAcceptChallenge(io, senderId, senderSocketId, targetId, targetUserSocketId, challengeId) {
     const gameId = await logic.createConnectFourGame(senderId, targetId);
     const acceptChallengeMessage = {
@@ -50,7 +59,13 @@ async function handleAcceptChallenge(io, senderId, senderSocketId, targetId, tar
     io.to(senderSocketId).emit("lobbyMessage", acceptChallengeMessage);
 }
 
-
+/**
+ * 
+ * @param {IO} io - Socket IO object. 
+ * @param {*} declineUserId - UserId of who declined the challenge.
+ * @param {*} targetUserSocketId - Socket Id of who the decline message is being sent to.
+ * @param {*} challengeId - Challenge Id.
+ */
 function handleDeclineChallenge(io, declineUserId, targetUserSocketId, challengeId) {
     const declineChallengeMessage = {
         action: "challengeDeclined",

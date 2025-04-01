@@ -249,7 +249,7 @@ io.on('connection', (socket) => {
         }
     });
 
-
+    // Handle in game moves.
     socket.on('makeMove', async (data) => {
         if (socket.rooms.has(data.gameId)) {
             const message = {
@@ -270,6 +270,7 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Handle when someone wins.
     socket.on('winner', async (data) => {
         if (socket.rooms.has(data.gameId)) {
             const gameId = data.gameId,
