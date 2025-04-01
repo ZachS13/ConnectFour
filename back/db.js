@@ -179,6 +179,11 @@ async function getGameInformation(gameId) {
     return result[0];
 }
 
+async function updateGameState(gameId, gameState) {
+    const [result] = await pool.execute(`UPDATE game SET game_state = ? WHERE game_id`, [gameState, gameId]);
+    return result.affectedRows > 0;
+}
+
 // Export the functions to use in other files
 module.exports = {
     getUserWithUsername,
@@ -197,6 +202,5 @@ module.exports = {
 
     createConnectFourGame,
     getGameInformation,
-
-
+    updateGameState,
 };

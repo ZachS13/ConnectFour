@@ -18,6 +18,7 @@ const io = socketIo(server, {
         origin: "*",                
     }
 });
+
 app.use(require('cors')({
     origin: "*",
     methods: ["GET", "POST"],
@@ -164,6 +165,19 @@ app.post('/getGameInformation', async (req, res) => {
         return res.status(200).json({ message: response });
     } catch (error) {
         return res.status(500).json({ error: "An error occured getting the game board!" });
+    }
+});
+
+app.post('/updateGameState', async (req, res) => {
+    const { gameState, gameId } = req.body;
+    try {
+        const response = await logic.updateGameState(gameState, gameId);
+        if(!response || response === undefined) {
+            return res.status(404).json({ error: "Game State was not updated!" });
+        } 
+        return res.status(200).json({ message: response });
+    } catch (error) {
+        return res.status(500).json({ error: "An error occured updating the gameState!" });
     }
 });
 

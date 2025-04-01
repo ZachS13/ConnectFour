@@ -213,6 +213,11 @@ async function getGameInformation(gameId) {
     return response;
 }
 
+async function updateGameState(gameState, gameId) {
+    const response = DB.updateGameState(gameState, gameId);
+    return response;
+}
+
 /**
  * VALIDATION AND SANITIZATION OF ALL THE PARAMETERS BEING SENT TO THE DATABASE
  * MAKES SURE ALL OF THE VALUES ARE IN THE CORRECT FORM AND CANNOT DAMAGE
@@ -324,5 +329,5 @@ module.exports = {
 
     createConnectFourGame,
     getGameInformation,
-
+    updateGameState,
 };
