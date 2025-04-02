@@ -2,7 +2,7 @@
  * Helper function to send the user to the login page.
  */
 function loginPage() {
-    window.location.href = "./login.html";
+    window.location.href = "./index.html";
 }
 
 /**
