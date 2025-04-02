@@ -1,0 +1,13 @@
+{
+    "name": "connect-four-frontend",
+    "version": "1.0.0",
+    "scripts": {
+        "deploy": "gh-pages -d ."
+    },
+    "devDependencies": {
+        "gh-pages": "^3.2.3"
+    },
+    "dependencies": {
+        "connect-four-frontend": "file:"
+    }
+}
