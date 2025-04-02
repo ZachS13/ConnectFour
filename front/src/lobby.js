@@ -254,6 +254,7 @@ const LOBBY = (function () {
 
     /**
      * Send the challenge to the database.
+     * @param {Integer} sessionId - Users sessionId.
      * @param {Integer} userId - User's ID
      * @param {Integer} challengerId - Who they want to play against.
      * @returns {Integer} - ID of the challenge in the DB.
@@ -274,6 +275,7 @@ const LOBBY = (function () {
 
     /**
      * Send the response to the challenge to the database.
+     * @param {Integer} sessionId - Users sessionId.
      * @param {Integer} challengeId - Id of the challenge.
      * @param {Object} reply - Object of the reply to the challenge.
      * @returns Rseponse from the database.
