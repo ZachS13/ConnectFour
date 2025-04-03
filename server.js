@@ -2,6 +2,8 @@
  * This is the server for Connect 4.
  */
 
+const { ok } = require('assert');
+
 const express    = require('express'),
       app        = express(),
       bodyParser = require('body-parser'),
@@ -31,6 +33,10 @@ const getClientIp = (req) => {
     const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.ip;
     return ip === '::1' ? '127.0.0.1' : ip;
 };
+
+app.get(`/`, (req, res) => {
+    res.status(200).send('OK');
+});
 
 // Handle login requests
 app.post(`/login`, async (req, res) => {
