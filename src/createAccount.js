@@ -52,7 +52,7 @@ function init() {
 
         } catch (error) {
             console.error('Error:', error);
-            showMessage(message, 'An error occurred. Please try again.', 'error');
+            showMessage(message, 'A Network Error Occured, Try again later.', 'error');
             return;
         }
     });
