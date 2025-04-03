@@ -1,3 +1,5 @@
+const API_URL = 'https://your-project-name.railway.app/api';
+
 /**
  * Helper function to send the user to the login page.
  */
@@ -28,7 +30,7 @@ function init() {
 
         try {
             // Create account
-            const response = await fetch('http://localhost:3000/createAccount', {
+            const response = await fetch(`${API_URL}/createAccount`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password, confirmPassword })

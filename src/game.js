@@ -1,4 +1,4 @@
-const API_URL = '://localhost:3000';
+const API_URL = 'https://your-project-name.railway.app/api';
 const urlParams = new URLSearchParams(window.location.search);
 /**
  * Check if the session variables are set, if they're
@@ -12,7 +12,7 @@ if (!userId || !sessionId) {
     window.location = './login.html';
 }
 try {
-    const responseSession = await fetch(`http${API_URL}/checkSession`, {
+    const responseSession = await fetch(`${API_URL}/checkSession`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, sessionId })
@@ -28,7 +28,7 @@ try {
     window.location = './login.html';
 }
 
-const socket = io(`http${API_URL}`, {
+const socket = io(`${API_URL}`, {
     query: { userId: userId }
 });
 
@@ -377,7 +377,7 @@ const GAME = (function () {
      * @returns Response from the server with the game information on the specific game_id.
      */
     async function getGameInformation(sessionId, gameId) {
-        let response = await fetch(`http${API_URL}/getGameInformation`, {
+        let response = await fetch(`${API_URL}/getGameInformation`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ sessionId, gameId })
@@ -396,7 +396,7 @@ const GAME = (function () {
      * @returns Opponent's username.
      */
     async function getOpponentUsername(oppUserId) {
-        let response = await fetch(`http${API_URL}/getUsername`, {
+        let response = await fetch(`${API_URL}/getUsername`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId: oppUserId })

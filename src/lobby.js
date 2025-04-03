@@ -1,4 +1,4 @@
-const API_URL = '://localhost:3000';
+const API_URL = 'https://your-project-name.railway.app/api';
 
 /**
  * Check if the session variables are set, if they're
@@ -12,7 +12,7 @@ if(!userId || !sessionId) {
     window.location = './login.html';
 }
 try {
-    const responseSession = await fetch(`http${API_URL}/checkSession`, {
+    const responseSession = await fetch(`${API_URL}/checkSession`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, sessionId })
@@ -37,7 +37,7 @@ const LOBBY = (function () {
      */
     function init() {
         dropDownWithUsernames();
-        const socket = io(`http${API_URL}`, {
+        const socket = io(`${API_URL}`, {
             query: { userId: userId }
         });
         const chatDiv = document.getElementById('chat'),
@@ -208,7 +208,7 @@ const LOBBY = (function () {
         const dropdown = document.getElementById('userSelect');
 
         try {
-            const response = await fetch(`http${API_URL}/usernames`, {
+            const response = await fetch(`${API_URL}/usernames`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
             });
@@ -239,7 +239,7 @@ const LOBBY = (function () {
      * @returns {String} Username corresponding to the ID.
      */
     async function getUsernameId(userId) {
-        const response = await fetch(`http${API_URL}/getUsername`, {
+        const response = await fetch(`${API_URL}/getUsername`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId })
@@ -260,7 +260,7 @@ const LOBBY = (function () {
      * @returns {Integer} - ID of the challenge in the DB.
      */
     async function sendChallengeToDB(sessionId, userId, challengerId) {
-        const response = await fetch(`http${API_URL}/sendChallenge`, {
+        const response = await fetch(`${API_URL}/sendChallenge`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ sessionId, userId, challengerId })
@@ -281,7 +281,7 @@ const LOBBY = (function () {
      * @returns Rseponse from the database.
      */
     async function sendChallengeResponse(sessionId, challengeId, reply) {
-        const response = await fetch(`http${API_URL}/challengeResponse`, {
+        const response = await fetch(`${API_URL}/challengeResponse`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ sessionId, challengeId, reply })
