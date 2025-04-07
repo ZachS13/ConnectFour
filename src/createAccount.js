@@ -1,4 +1,4 @@
-const API_URL = 'connectfour-production.up.railway.app';
+const API_URL = 'https://connectfour-production.up.railway.app';
 
 /**
  * Helper function to send the user to the login page.
