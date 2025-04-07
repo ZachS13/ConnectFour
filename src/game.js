@@ -1,4 +1,4 @@
-const API_URL = 'https://your-project-name.railway.app';
+const API_URL = 'connectfour-production.up.railway.app';
 const urlParams = new URLSearchParams(window.location.search);
 /**
  * Check if the session variables are set, if they're

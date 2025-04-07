@@ -1,4 +1,4 @@
-const API_URL = 'https://your-project-name.railway.app';
+const API_URL = 'connectfour-production.up.railway.app';
 
 /**
  * Check if the session variables are set, if they're
