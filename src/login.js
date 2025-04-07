@@ -1,4 +1,4 @@
-const API_URL = 'https://your-project-name.railway.app/api';
+const API_URL = 'https://your-project-name.railway.app';
 
 /**
  * Helper function to send the user to the create account page.
