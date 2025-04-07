@@ -47,7 +47,7 @@ function init() {
             showMessage(message, 'Account Created Successfully', 'success');
 
             setTimeout(() => {
-                window.location = `./login.html`;
+                window.location = `./index.html`;
             }, 750);
 
         } catch (error) {
