@@ -1,20 +1,34 @@
- Real-time multiplayer Connect Four game with a focus on user experience, game security, and scalable architecture. 
+# Connect Four – Real-Time Multiplayer Game
 
-Key features include:
-- Lobby & Matchmaking – Players can chat, challenge opponents, and start games seamlessly in real time using WebSockets.
-- Interactive UI – Built with SVG & AJAX, enabling smooth gameplay and animations.
-- Game State Management – Game moves, session data, and player history are stored in a MySQL database, ensuring consistency and preventing tampering.
-- Secure Backend & API – Designed with Node.js, MySQL, and RESTful principles, implementing security best practices to prevent exploits.
-- Full-Stack Development – Integrated frontend, backend, and database layers to create a seamless user experience.
+A real-time multiplayer **Connect Four** game focused on user experience, game security, and scalable architecture.
 
-Frontend:
-- HTML & CSS
-- JavaScript
-- AJAX
-- SVG
+## Key Features
 
-Backend:
-- Node.js
-- Express.js
-- WebSockets
-- MySQL
+- **Lobby & Matchmaking**  
+  Chat with other players, issue challenges, and join games instantly using WebSockets.
+
+- **Interactive UI**  
+  Built with SVG and AJAX for smooth animations and responsive gameplay.
+
+- **Game State Management**  
+  All moves, sessions, and player history are stored in a MySQL database to maintain consistency and prevent tampering.
+
+- **Secure Backend & API**  
+  Developed using Node.js and Express with RESTful architecture, following security best practices to prevent common exploits.
+
+- **Full-Stack Integration**  
+  Seamless connection between frontend, backend, and database for a complete multiplayer experience.
+
+## Tech Stack
+
+### Frontend
+- HTML & CSS  
+- JavaScript  
+- AJAX  
+- SVG  
+
+### Backend
+- Node.js  
+- Express.js  
+- WebSockets  
+- MySQL  
